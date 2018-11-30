@@ -60,7 +60,13 @@ public class Deck implements Iterable<Card>
 
         for (Suit suit : Suit.values()) {
             for (int value = Card.CARD_VALUE_MIN; value <= Card.CARD_VALUE_MAX; value++) {
-                deck.cards.add(new Card(suit, value));
+                if (value == 10) {
+                    for (Symbol symbol : Symbol.values()) {
+                        deck.cards.add(new Card(suit, value, symbol));
+                    }
+                } else {
+                    deck.cards.add(new Card(suit, value, Symbol.NUMBER));               
+                }
             }
         }
 

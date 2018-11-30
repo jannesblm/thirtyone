@@ -14,12 +14,6 @@ public class Main extends Application
 
     public void start(Stage stage)
     {
-        stage.setTitle("Thirtyone");
-
-        Group root = new Group();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-
-
+        // TODO: Implement GUI start functionality
     }
 }
