@@ -1,13 +1,16 @@
 package de.lebk.thirtyone.game.item;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.gson.Gson;
 
-public class Deck implements Iterable<Card>
+import java.util.TreeSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Deck implements Iterable<Card>, Comparable<Deck>
 {
-    private List<Card> cards;
-    private int limit;
+    private Set<Card> cards;
+    private final int limit;
 
     public Deck()
     {
@@ -16,7 +19,7 @@ public class Deck implements Iterable<Card>
 
     public Deck(int limit)
     {
-        cards = new ArrayList<>();
+        cards = new TreeSet<>();
 
         if (limit < 0) {
             throw new IllegalArgumentException("Invalid range for limit argument");
@@ -33,7 +36,7 @@ public class Deck implements Iterable<Card>
     public void add(Card card) throws DeckOutOfBoundsException
     {
         if (violatesBounds(1)) {
-            throw new DeckOutOfBoundsException("Modification violates deck's bounds: Size should be <= " + limit);
+            throw new DeckOutOfBoundsException("Modification violates decks bounds: Size should be <= " + limit);
         }
 
         cards.add(card);
@@ -43,7 +46,7 @@ public class Deck implements Iterable<Card>
     public void remove(Card card) throws DeckOutOfBoundsException
     {
         if (violatesBounds(-1)) {
-            throw new DeckOutOfBoundsException("Modification violates deck's bounds: Size should be > 0");
+            throw new DeckOutOfBoundsException("Modification violates decks bounds: Size should be > 0");
         }
 
         cards.remove(card);
@@ -65,11 +68,38 @@ public class Deck implements Iterable<Card>
                         deck.cards.add(new Card(suit, value, symbol));
                     }
                 } else {
-                    deck.cards.add(new Card(suit, value, Symbol.NUMBER));               
+                    deck.cards.add(new Card(suit, value, Symbol.NUMBER));
                 }
             }
         }
 
         return deck;
+    }
+
+    /**
+     * Calculate points according to Thirtyone's rules
+     *
+     * @return int
+     */
+    private int getPoints()
+    {
+        return cards.stream()
+                .collect(Collectors.groupingBy(Card::getSuit))
+                .entrySet()
+                .stream()
+                .mapToInt(e -> e.getValue().stream().map(Card::getValue).reduce(0, Integer::sum))
+                .max()
+                .orElse(0);
+    }
+
+    @Override
+    public int compareTo(Deck deck)
+    {
+        return (int) Math.signum(this.getPoints() - deck.getPoints());
+    }
+
+    public String toString()
+    {
+        return new Gson().toJson(this);
     }
 }

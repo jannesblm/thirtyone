@@ -1,6 +1,6 @@
 package de.lebk.thirtyone.game.item;
 
-class DeckOutOfBoundsException extends Exception
+public class DeckOutOfBoundsException extends Exception
 {
     DeckOutOfBoundsException(String message)
     {
