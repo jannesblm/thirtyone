@@ -77,17 +77,18 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
     }
 
     /**
-     * Calculate points according to Thirtyone's rules
+     * Deck point calculation conforming with the rules of Thirtyone
      *
      * @return int
      */
     private int getPoints()
     {
+        // Map each Suit group to the sum of its cards values
         return cards.stream()
                 .collect(Collectors.groupingBy(Card::getSuit))
                 .entrySet()
                 .stream()
-                .mapToInt(e -> e.getValue().stream().map(Card::getValue).reduce(0, Integer::sum))
+                .mapToInt(e -> e.getValue().stream().mapToInt(Card::getValue).reduce(0, Integer::sum))
                 .max()
                 .orElse(0);
     }
@@ -101,5 +102,10 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
     public String toString()
     {
         return new Gson().toJson(this);
+    }
+
+    public int size()
+    {
+        return cards.size();
     }
 }

@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 
 public class Card implements Comparable<Card>
 {
-    protected static final int CARD_VALUE_MAX = 11;
-    protected static final int CARD_VALUE_MIN = 7;
+    static final int CARD_VALUE_MAX = 11;
+    static final int CARD_VALUE_MIN = 7;
     
     private final int value;
     private final Suit suit;
@@ -16,7 +16,7 @@ public class Card implements Comparable<Card>
         this(suit, value, Symbol.NUMBER);
     }
 
-    public Card(Suit suit, int value, Symbol symbol)
+    Card(Suit suit, int value, Symbol symbol)
     {
         if (value > CARD_VALUE_MAX || value < CARD_VALUE_MIN) {
             throw new IllegalArgumentException("Card value " + value + " out of range");
@@ -27,26 +27,39 @@ public class Card implements Comparable<Card>
         this.symbol = symbol;
     }
 
-    public int getValue()
+    int getValue()
     {
         return value;
     }
 
-    public Suit getSuit()
+    Suit getSuit()
     {
         return suit;
     }
 
-    public Symbol getSymbol()
+    private Symbol getSymbol()
     {
         return symbol;
     }
 
+    /**
+     * This method does not conform to in-game comparison rules and should not be used to determine a winning deck.
+     * The Symbol's rank is considered when both, the value and the Suit's rank, are equal to preserve the uniqueness
+     * of the Deck's underlying Set.
+     *
+     * @see Deck#Deck(int limit)
+     * @param card The compared card object
+     * @return int
+     */
     @Override
     public int compareTo(Card card)
     {
         if (this.getValue() == card.getValue()) {
-            return (int) Math.signum(this.getSuit().getRank() - card.getSuit().getRank());
+            if (this.getSuit().getRank() != card.getSuit().getRank()) {
+                return (int) Math.signum(this.getSuit().getRank() - card.getSuit().getRank());
+            } else {
+                return (int) Math.signum(this.getSymbol().getRank() - card.getSymbol().getRank());
+            }
         }
 
         return (int) Math.signum(this.getValue() - card.getValue());
