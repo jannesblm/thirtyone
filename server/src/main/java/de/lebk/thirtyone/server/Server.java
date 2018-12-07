@@ -1,4 +1,4 @@
-package de.lebk.thirtyone.game.network;
+package de.lebk.thirtyone.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -8,8 +8,12 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
 
 public class Server
 {
@@ -31,10 +35,14 @@ public class Server
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                    .childHandler(new ChannelInitializer<SocketChannel>()
+                    {
                         @Override
-                        public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new ServerHandler());
+                        public void initChannel(SocketChannel ch)
+                        {
+                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                            ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
+                            ch.pipeline().addLast(new MessageHandler());
                         }
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
@@ -47,5 +55,4 @@ public class Server
             bossGroup.shutdownGracefully();
         }
     }
-
 }

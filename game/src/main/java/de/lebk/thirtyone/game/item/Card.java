@@ -44,10 +44,9 @@ public class Card implements Comparable<Card>
 
     /**
      * This method does not conform to in-game comparison rules and should not be used to determine a winning deck.
-     * The Symbol's rank is considered when both, the value and the Suit's rank, are equal to preserve the uniqueness
-     * of the Deck's underlying Set.
+     * The Symbol's rank is considered when both, the value and the Suit's rank, are equal. This is to preserve the
+     * uniqueness of the Deck.
      *
-     * @see Deck#Deck(int limit)
      * @param card The compared card object
      * @return int
      */
@@ -55,10 +54,10 @@ public class Card implements Comparable<Card>
     public int compareTo(Card card)
     {
         if (this.getValue() == card.getValue()) {
-            if (this.getSuit().getRank() != card.getSuit().getRank()) {
-                return (int) Math.signum(this.getSuit().getRank() - card.getSuit().getRank());
-            } else {
+            if (this.getSuit().getRank() == card.getSuit().getRank()) {
                 return (int) Math.signum(this.getSymbol().getRank() - card.getSymbol().getRank());
+            } else {
+                return (int) Math.signum(this.getSuit().getRank() - card.getSuit().getRank());
             }
         }
 

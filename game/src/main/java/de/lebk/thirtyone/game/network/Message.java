@@ -5,10 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import java.util.Optional;
+
 public class Message
 {
     private String command;
-    private JsonElement argument;
+    private JsonElement json;
 
     /**
      * Creates an empty message
@@ -16,31 +18,41 @@ public class Message
     public Message()
     {
         command = "";
-        argument = new JsonObject();
+        json = new JsonObject();
     }
 
-    private Message(String command, JsonElement argument)
+    private Message(String command, JsonElement json)
     {
         this.command = command;
-        this.argument = argument;
+        this.json = json;
     }
 
-    public static Message parse(String data) throws MessageParseException
+    public static Optional<Message> parse(String data)
     {
         String[] tokens = data.split(" ");
 
-        if (tokens.length > 2) {
-            throw new MessageParseException("Message is malformed");
+        if (tokens.length != 2) {
+            return Optional.empty();
         }
 
         JsonObject element;
 
         try {
-            element = new JsonParser().parse(tokens.length == 2 ? tokens[1] : "").getAsJsonObject();
+            element = new JsonParser().parse(tokens[1]).getAsJsonObject();
         } catch (JsonSyntaxException exception) {
-            throw new MessageParseException("Cannot parse JSON data", exception);
+            return Optional.empty();
         }
 
-        return new Message(tokens[0].toUpperCase(), element);
+        return Optional.of(new Message(tokens[0].toUpperCase(), element));
+    }
+
+    public String getCommand()
+    {
+        return this.command;
+    }
+
+    public JsonElement getJSON()
+    {
+        return this.json;
     }
 }

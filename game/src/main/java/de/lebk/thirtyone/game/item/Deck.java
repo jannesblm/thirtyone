@@ -2,15 +2,20 @@ package de.lebk.thirtyone.game.item;
 
 import com.google.gson.Gson;
 
-import java.util.TreeSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Deck implements Iterable<Card>, Comparable<Deck>
 {
-    private Set<Card> cards;
     private final int limit;
+    private final Random randomizer;
+    private List<Card> cards;
+
+    Deck(List<Card> cards)
+    {
+        this(cards.size());
+        addAll(cards);
+    }
 
     public Deck()
     {
@@ -19,44 +24,20 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
 
     public Deck(int limit)
     {
-        cards = new TreeSet<>();
-
         if (limit < 0) {
             throw new IllegalArgumentException("Invalid range for limit argument");
         }
 
         this.limit = limit;
+        randomizer = new Random(Double.doubleToLongBits(Math.random()));
+        cards = Collections.synchronizedList(new ArrayList<>());
     }
 
-    public Iterator<Card> iterator()
-    {
-        return cards.iterator();
-    }
-
-    public void add(Card card) throws DeckOutOfBoundsException
-    {
-        if (violatesBounds(1)) {
-            throw new DeckOutOfBoundsException("Modification violates decks bounds: Size should be <= " + limit);
-        }
-
-        cards.add(card);
-    }
-
-
-    public void remove(Card card) throws DeckOutOfBoundsException
-    {
-        if (violatesBounds(-1)) {
-            throw new DeckOutOfBoundsException("Modification violates decks bounds: Size should be > 0");
-        }
-
-        cards.remove(card);
-    }
-
-    private boolean violatesBounds(int change)
-    {
-        return cards.size() + change > limit || cards.size() + change <= 0;
-    }
-
+    /**
+     * Creates a new, shuffled Skat deck
+     *
+     * @return A new, shuffled Skat deck
+     */
     public static Deck newDeck()
     {
         Deck deck = new Deck(32);
@@ -73,7 +54,62 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
             }
         }
 
+        deck.shuffle();
         return deck;
+    }
+
+    public Iterator<Card> iterator()
+    {
+        return cards.iterator();
+    }
+
+    private void addAll(Collection<Card> cards)
+    {
+        cards.forEach(this::add);
+    }
+
+    /**
+     * Adds a card to the deck. If the deck's limits will be exceeded by this action or the card already is present in
+     * the deck this method will simply return.
+     *
+     * @param card The card to add
+     */
+    private void add(Card card)
+    {
+        if (violatesBounds(1)) {
+            return;
+        }
+
+        if (cards.contains(card)) {
+            return;
+        }
+
+        cards.add(card);
+    }
+
+    /**
+     * Removes a card from the deck. If the deck's limits will be exceeded this method will simply return.
+     *
+     * @param card The card to add
+     */
+    public void remove(Card card)
+    {
+        if (violatesBounds(-1)) {
+            return;
+        }
+
+        cards.remove(card);
+    }
+
+    /**
+     * Determines if a change in size will violate the deck's limits
+     *
+     * @param change A positive or negative integer representing the change
+     * @return boolean
+     */
+    private boolean violatesBounds(int change)
+    {
+        return cards.size() + change > limit || cards.size() + change < 0;
     }
 
     /**
@@ -107,5 +143,30 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
     public int size()
     {
         return cards.size();
+    }
+
+    private void shuffle()
+    {
+        Collections.shuffle(cards, randomizer);
+    }
+
+    private Optional<Card> pop()
+    {
+        if (violatesBounds(-1)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(cards.remove(0));
+    }
+
+    public Deck deal(int amount) throws DeckIntegrityException
+    {
+        Deck deal = new Deck(amount);
+
+        for (int i = 0; i < amount; i++) {
+            deal.add(pop().orElseThrow(() -> new DeckIntegrityException("No cards remaining!")));
+        }
+
+        return deal;
     }
 }
