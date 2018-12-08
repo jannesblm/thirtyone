@@ -74,7 +74,7 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
      *
      * @param card The card to add
      */
-    private void add(Card card)
+    public void add(Card card)
     {
         if (violatesBounds(1)) {
             return;

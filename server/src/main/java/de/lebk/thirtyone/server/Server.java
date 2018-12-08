@@ -1,5 +1,8 @@
 package de.lebk.thirtyone.server;
 
+import de.lebk.thirtyone.game.network.MessageDecoder;
+import de.lebk.thirtyone.game.network.Round;
+import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -12,19 +15,30 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 
-public class Server
+class Server
 {
-    private int port;
+    private static final Logger LOG = LogManager.getLogger();
 
-    public Server(int port)
+    private int port;
+    private Round round;
+
+    Server(int port)
     {
         this.port = port;
+        this.round = new Round();
     }
 
-    public void run() throws InterruptedException
+    public static void validateVersion(String versionString) throws ConnectError
+    {
+        // TODO: Version validation code
+    }
+
+    void run() throws InterruptedException
     {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -42,13 +56,13 @@ public class Server
                         {
                             ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
                             ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
-                            ch.pipeline().addLast(new MessageHandler());
+                            ch.pipeline().addLast(new MessageDecoder());
+                            ch.pipeline().addLast(new PlayerHandler(round));
                         }
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             ChannelFuture channelFuture = bootstrap.bind(port).sync();
-
             channelFuture.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
