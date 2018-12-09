@@ -12,10 +12,10 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="10">
-      <module name="client" target="10" />
-      <module name="game" target="10" />
-      <module name="server" target="10" />
-      <module name="thirtyone" target="10" />
+      <module name="client" target="11" />
+      <module name="game" target="11" />
+      <module name="server" target="11" />
+      <module name="thirtyone" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
