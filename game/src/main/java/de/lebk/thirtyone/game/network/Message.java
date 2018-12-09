@@ -10,9 +10,16 @@ import io.netty.buffer.Unpooled;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class Message implements Serializable
 {
+    private static final Pattern DELIMITER;
+
+    static {
+        DELIMITER = Pattern.compile("\u241F", Pattern.LITERAL);
+    }
+
     private final String command;
     private final JsonElement json;
 
@@ -20,6 +27,7 @@ public class Message implements Serializable
     {
         this.command = command;
         this.json = json;
+
     }
 
     public static ByteBuf prepare(String command)
@@ -34,7 +42,7 @@ public class Message implements Serializable
 
     public static Optional<Message> parse(String data)
     {
-        String[] tokens = data.split(" ");
+        String[] tokens = DELIMITER.split(data, 2);
 
         if (tokens.length != 2) {
             return Optional.empty();
@@ -78,7 +86,7 @@ public class Message implements Serializable
 
     public String toString()
     {
-        return this.getCommand() + " " + this.getJSON() + System.lineSeparator();
+        return this.getCommand() + DELIMITER + this.getJSON() + System.lineSeparator();
     }
 
     public ByteBuf toByteBuf()

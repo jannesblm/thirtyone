@@ -17,6 +17,8 @@ public class MessageDecoder extends MessageToMessageDecoder<String>
     {
         SocketAddress remoteAddress = ctx.channel().remoteAddress();
 
+        LOG.debug("Got raw message: " + s);
+
         Message.parse(s)
                 .ifPresentOrElse(out::add, () -> {
                     LOG.debug("Got invalid message from " + remoteAddress + ". Closing connection.");
