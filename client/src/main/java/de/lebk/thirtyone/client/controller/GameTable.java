@@ -49,9 +49,6 @@ public class GameTable extends Application
     @FXML
     private HBox middleBox;
 
-    @FXML
-    private HBox gridPane;
-
 
     public static void main(String[] args)
     {
@@ -196,6 +193,4 @@ public class GameTable extends Application
 
         button.setGraphic(toggleImage);
     }
-
-
 }
