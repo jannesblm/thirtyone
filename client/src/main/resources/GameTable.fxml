@@ -28,7 +28,7 @@
                 <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="200.0" vgrow="ALWAYS"/>
             </rowConstraints>
             <children>
-                <HBox id="leftOpponentBox" alignment="CENTER" spacing="5.0">
+                <HBox fx:id="leftOpponentBox" alignment="CENTER" spacing="5.0">
                     <children>
                         <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
                                 prefWidth="60.0" styleClass="cardButton">
@@ -59,7 +59,7 @@
                         </Button>
                     </children>
                 </HBox>
-                <HBox id="middleOpponentBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1">
+                <HBox fx:id="middleOpponentBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1">
                     <children>
                         <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
                                 prefWidth="60.0" styleClass="cardButton">
@@ -90,7 +90,7 @@
                         </Button>
                     </children>
                 </HBox>
-                <HBox id="rightOpponentBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="2"
+                <HBox fx:id="rightOpponentBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="2"
                       GridPane.vgrow="ALWAYS">
                     <children>
                         <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
@@ -124,7 +124,7 @@
                 </HBox>
             </children>
         </GridPane>
-        <HBox id="currentPlayerBox" alignment="CENTER" spacing="15.0" GridPane.rowIndex="2">
+        <HBox fx:id="currentPlayerBox" alignment="CENTER" spacing="15.0" GridPane.rowIndex="2">
             <children>
                 <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
                               prefWidth="130.0" styleClass="cardButton" userData="0">
@@ -155,10 +155,10 @@
                 </ToggleButton>
             </children>
         </HBox>
-        <HBox id="middleBox" alignment="CENTER" spacing="15.0" GridPane.rowIndex="1">
+        <HBox fx:id="middleBox" alignment="CENTER" spacing="15.0" GridPane.rowIndex="1">
             <children>
                 <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
-                              prefWidth="130.0">
+                              prefWidth="130.0" styleClass="cardButton" >
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -167,7 +167,7 @@
                     </padding>
                 </ToggleButton>
                 <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
-                              prefWidth="130.0">
+                              prefWidth="130.0" styleClass="cardButton" >
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -176,7 +176,7 @@
                     </padding>
                 </ToggleButton>
                 <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
-                              prefWidth="130.0">
+                              prefWidth="130.0" styleClass="cardButton" >
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>

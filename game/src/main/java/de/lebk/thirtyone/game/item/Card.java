@@ -75,4 +75,25 @@ public class Card implements Comparable<Card>
     {
         return new Gson().toJson(this);
     }
+
+    public String getImageName(){
+        StringBuilder url = new StringBuilder();
+        switch (symbol){
+            case NUMBER: url.append(value); break;
+            case JACK: url.append(Symbol.JACK.name().toLowerCase()); break;
+            case KING: url.append(Symbol.KING.name().toLowerCase()); break;
+            case QUEEN: url.append(Symbol.QUEEN.name().toLowerCase()); break;
+            default: throw new UnsupportedOperationException();
+        }
+        url.append("_of_");
+        switch (suit){
+            case CLUBS: url.append(Suit.CLUBS.name().toLowerCase()); break;
+            case DIAMONDS: url.append(Suit.DIAMONDS.name().toLowerCase()); break;
+            case HEARTS: url.append(Suit.HEARTS.name().toLowerCase()); break;
+            case SPADES: url.append(Suit.SPADES.name().toLowerCase()); break;
+            default: throw new UnsupportedOperationException();
+        }
+        url.append(".png");
+        return url.toString();
+    }
 }
