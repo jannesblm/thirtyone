@@ -30,9 +30,8 @@
             <children>
                 <HBox id="leftOpponentBox" alignment="CENTER" spacing="5.0">
                     <children>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#leftOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -40,9 +39,8 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </padding>
                         </Button>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#leftOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -50,9 +48,8 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </padding>
                         </Button>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#leftOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -64,9 +61,8 @@
                 </HBox>
                 <HBox id="middleOpponentBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1">
                     <children>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#middleOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -74,9 +70,8 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </padding>
                         </Button>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#middleOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -84,9 +79,8 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </padding>
                         </Button>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#middleOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -99,9 +93,8 @@
                 <HBox id="rightOpponentBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="2"
                       GridPane.vgrow="ALWAYS">
                     <children>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#rightOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -109,9 +102,8 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </padding>
                         </Button>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#rightOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -119,9 +111,8 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </padding>
                         </Button>
-                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false"
-                                onMouseClicked="#rightOpponentBoxClicked" prefHeight="90.0" prefWidth="60.0"
-                                styleClass="cardButton">
+                        <Button maxHeight="90.0" maxWidth="100.0" mnemonicParsing="false" prefHeight="90.0"
+                                prefWidth="60.0" styleClass="cardButton">
                             <HBox.margin>
                                 <Insets bottom="10.0" top="20.0"/>
                             </HBox.margin>
@@ -135,9 +126,8 @@
         </GridPane>
         <HBox id="currentPlayerBox" alignment="CENTER" spacing="15.0" GridPane.rowIndex="2">
             <children>
-                <ToggleButton userData="0" maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false"
-                              onMouseClicked="#currentPlayerBoxClicked" prefHeight="180.0" prefWidth="130.0"
-                              styleClass="cardButton">
+                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
+                              prefWidth="130.0" styleClass="cardButton" userData="0">
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -145,9 +135,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </padding>
                 </ToggleButton>
-                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false"
-                              onMouseClicked="#currentPlayerBoxClicked" prefHeight="180.0" prefWidth="130.0"
-                              styleClass="cardButton">
+                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
+                              prefWidth="130.0" styleClass="cardButton">
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -155,9 +144,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </padding>
                 </ToggleButton>
-                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false"
-                              onMouseClicked="#currentPlayerBoxClicked" prefHeight="180.0" prefWidth="130.0"
-                              styleClass="cardButton">
+                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
+                              prefWidth="130.0" styleClass="cardButton">
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -169,8 +157,8 @@
         </HBox>
         <HBox id="middleBox" alignment="CENTER" spacing="15.0" GridPane.rowIndex="1">
             <children>
-                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false"
-                              onMouseClicked="#middleBoxClicked" prefHeight="180.0" prefWidth="130.0">
+                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
+                              prefWidth="130.0">
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -178,8 +166,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </padding>
                 </ToggleButton>
-                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false"
-                              onMouseClicked="#middleBoxClicked" prefHeight="180.0" prefWidth="130.0">
+                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
+                              prefWidth="130.0">
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -187,8 +175,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </padding>
                 </ToggleButton>
-                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false"
-                              onMouseClicked="#middleBoxClicked" prefHeight="180.0" prefWidth="130.0">
+                <ToggleButton maxHeight="200.0" maxWidth="150.0" mnemonicParsing="false" prefHeight="180.0"
+                              prefWidth="130.0">
                     <HBox.margin>
                         <Insets bottom="10.0" top="10.0"/>
                     </HBox.margin>
@@ -203,9 +191,10 @@
         </HBox>
         <ToolBar prefHeight="18.0" prefWidth="800.0" GridPane.rowIndex="3">
             <items>
-                <Button mnemonicParsing="false" text="Button"/>
+                <Button fx:id="connectButton" mnemonicParsing="false" onMouseClicked="#onConnectButtonClick"
+                        text="Verbinden"/>
             </items>
         </ToolBar>
-        <TextArea editable="false" prefHeight="77.0" prefWidth="800.0" GridPane.rowIndex="4"/>
+        <TextArea fx:id="logArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4"/>
     </children>
 </GridPane>

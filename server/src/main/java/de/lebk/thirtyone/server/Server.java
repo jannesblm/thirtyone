@@ -1,7 +1,7 @@
 package de.lebk.thirtyone.server;
 
 import de.lebk.thirtyone.game.network.MessageDecoder;
-import de.lebk.thirtyone.game.network.Round;
+import de.lebk.thirtyone.game.network.NetworkRound;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -25,12 +25,12 @@ class Server
     private static final Logger LOG = LogManager.getLogger();
 
     private int port;
-    private Round round;
+    private NetworkRound round;
 
     Server(int port)
     {
         this.port = port;
-        this.round = new Round();
+        this.round = new NetworkRound();
     }
 
     public static void validateVersion(String versionString) throws ConnectError

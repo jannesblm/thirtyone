@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import de.lebk.thirtyone.game.network.Message;
 import de.lebk.thirtyone.game.network.NetworkPlayer;
-import de.lebk.thirtyone.game.network.Round;
+import de.lebk.thirtyone.game.network.NetworkRound;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,10 +18,10 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private final Round round;
+    private final NetworkRound round;
     private final NetworkPlayer player;
 
-    PlayerHandler(Round round)
+    PlayerHandler(NetworkRound round)
     {
         player = new NetworkPlayer();
         this.round = round;

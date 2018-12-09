@@ -11,4 +11,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
     {
 
     }
+
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception
+    {
+        ctx.fireChannelInactive();
+    }
 }
