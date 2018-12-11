@@ -1,14 +1,12 @@
 package de.lebk.thirtyone.game.network;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -28,6 +26,12 @@ public class Message implements Serializable
         this.command = command;
         this.json = new JsonObject();
 
+    }
+
+    public Message(String command, Map map)
+    {
+        this.command = command;
+        this.json = new GsonBuilder().create().toJsonTree(map);
     }
 
     public Message(String command, JsonElement json)

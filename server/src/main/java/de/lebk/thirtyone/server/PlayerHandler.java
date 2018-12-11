@@ -6,6 +6,7 @@ import de.lebk.thirtyone.game.network.Message;
 import de.lebk.thirtyone.game.network.NetworkPlayer;
 import de.lebk.thirtyone.game.network.NetworkRound;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,38 +29,36 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message)
     {
-        if (player.isJoined()) {
-
-        } else {
+        if (! player.isJoined()) {
             if (!message.getCommand().equalsIgnoreCase("HELLO")) {
-                LOG.debug("Player " + player.getUuid() + " is not connected and did not send HELLO command. Disconnecting.");
-                ctx.close();
+                LOG.debug("Player " + player.getUuid() + " is not joined and did not send HELLO command.");
+
+                try {
+                    ctx.close().sync();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return;
             }
 
             try {
-                JsonElement versionMember = message.get("version").orElseThrow();
-                String version = versionMember.getAsString();
+                // TODO: Version validation
 
-                Server.validateVersion(version);
-                player.join();
+                player.join(ctx.channel());
 
-                // Join was successful. Welcome the player.
-                ctx.writeAndFlush(Message.prepare("HELLO"));
-                LOG.info("Player " + player.getCurrentRound().playerCount() + " joined with UUID " + player.getUuid());
+                LOG.info("Player " + player.getRound().playerCount() + " joined with UUID " + player.getUuid());
             } catch (ConnectError e) {
-                Map<String, String> reason = Map.of("reason", e.getMessage());
-
-                ctx.writeAndFlush(Message.prepare("BYE",
-                        new GsonBuilder().create().toJsonTree(reason))).addListener(ChannelFutureListener.CLOSE);
+                player.disconnect(e.getMessage());
                 LOG.debug("Player " + player.getUuid() + " could not join: " + e.getMessage());
             } catch (Exception e) {
-                Map<String, String> reason = Map.of("reason", "Internal server error");
-
-                ctx.writeAndFlush(Message.prepare("BYE",
-                        new GsonBuilder().create().toJsonTree(reason))).addListener(ChannelFutureListener.CLOSE);
+                player.disconnect("Internal server error");
                 LOG.debug("Internal error on player join: " + e.getMessage());
             }
         }
+
+
+
     }
 
     public void channelInactive(ChannelHandlerContext ctx)

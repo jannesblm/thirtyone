@@ -1,5 +1,6 @@
 package de.lebk.thirtyone.game.network;
 
+import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.Round;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
 
@@ -19,5 +20,12 @@ public class NetworkRound extends Round
     public void leave(NetworkPlayer player)
     {
         players.remove(player);
+    }
+
+    public void broadcast(Message message)
+    {
+        for (Player player : players) {
+            ((NetworkPlayer) player).send(message);
+        }
     }
 }

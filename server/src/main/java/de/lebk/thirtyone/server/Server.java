@@ -33,11 +33,6 @@ class Server
         this.round = new NetworkRound();
     }
 
-    public static void validateVersion(String versionString) throws ConnectError
-    {
-        // TODO: Version validation code
-    }
-
     void run() throws InterruptedException
     {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
