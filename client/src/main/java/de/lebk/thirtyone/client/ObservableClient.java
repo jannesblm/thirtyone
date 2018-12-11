@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class ObservableClient extends ThreadedClient
 {
     private BooleanProperty connected;
-    private String lastError;
 
     private Channel channel;
 
@@ -17,7 +16,6 @@ public class ObservableClient extends ThreadedClient
     {
         super();
         connected = new SimpleBooleanProperty(false);
-        lastError = "";
     }
 
     @Override
@@ -39,21 +37,12 @@ public class ObservableClient extends ThreadedClient
     @Override
     public void onDisconnect(Throwable cause)
     {
-        if (cause != null) {
-            lastError = cause.getMessage();
-        }
-
         connected.setValue(false);
     }
 
     public BooleanProperty getConnectedProperty()
     {
         return connected;
-    }
-
-    public String getLastError()
-    {
-        return lastError;
     }
 
     public boolean isConnected()

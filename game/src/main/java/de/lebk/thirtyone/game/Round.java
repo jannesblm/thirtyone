@@ -1,21 +1,45 @@
 package de.lebk.thirtyone.game;
 
+import de.lebk.thirtyone.game.item.Card;
+import de.lebk.thirtyone.game.item.Deck;
+
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class Round
 {
-    protected static final int MAX_PLAYERS = 4;
     protected Set<Player> players;
+    protected Deck middle;
+    protected boolean started;
 
     public Round()
     {
         players = Collections.synchronizedSet(new HashSet<>());
     }
 
+    public Optional<Player> getPlayer(Player player)
+    {
+        return players.stream().filter(p -> p.equals(player)).findFirst();
+    }
+
     public int playerCount()
     {
         return players.size();
+    }
+
+    public void swap(Player p, Card card, Card middleCard) throws GameException
+    {
+        Optional<Player> player = getPlayer(p);
+
+        if (!player.isPresent()) {
+            throw new GameException("Swapping player was not found in this round!");
+        }
+
+        Deck deck = player.get().getDeck();
+
+        deck.swap(card, middleCard);
+        middle.swap(middleCard, card);
     }
 }

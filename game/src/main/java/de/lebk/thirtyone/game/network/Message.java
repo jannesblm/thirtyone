@@ -23,7 +23,14 @@ public class Message implements Serializable
     private final String command;
     private final JsonElement json;
 
-    private Message(String command, JsonElement json)
+    public Message(String command)
+    {
+        this.command = command;
+        this.json = new JsonObject();
+
+    }
+
+    public Message(String command, JsonElement json)
     {
         this.command = command;
         this.json = json;

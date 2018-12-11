@@ -169,4 +169,13 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
 
         return deal;
     }
+
+    public boolean swap(Card c1, Card c2)
+    {
+        if (cards.contains(c2)) {
+            return false;
+        }
+
+        return Collections.replaceAll(cards, c1, c2);
+    }
 }

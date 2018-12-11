@@ -18,22 +18,20 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private final NetworkRound round;
     private final NetworkPlayer player;
 
     PlayerHandler(NetworkRound round)
     {
-        player = new NetworkPlayer();
-        this.round = round;
+        player = new NetworkPlayer(round);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message)
     {
-        if (player.isConnected()) {
+        if (player.isJoined()) {
 
         } else {
-            if (!message.getCommand().equals("HELLO")) {
+            if (!message.getCommand().equalsIgnoreCase("HELLO")) {
                 LOG.debug("Player " + player.getUuid() + " is not connected and did not send HELLO command. Disconnecting.");
                 ctx.close();
             }
@@ -43,11 +41,11 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
                 String version = versionMember.getAsString();
 
                 Server.validateVersion(version);
-                round.join(player);
+                player.join();
 
                 // Join was successful. Welcome the player.
                 ctx.writeAndFlush(Message.prepare("HELLO"));
-                LOG.info("Player " + round.playerCount() + " joined with UUID " + player.getUuid());
+                LOG.info("Player " + player.getCurrentRound().playerCount() + " joined with UUID " + player.getUuid());
             } catch (ConnectError e) {
                 Map<String, String> reason = Map.of("reason", e.getMessage());
 
@@ -67,7 +65,7 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
     public void channelInactive(ChannelHandlerContext ctx)
     {
         LOG.info("Player " + player.getUuid() + " (" + ctx.channel().remoteAddress() + ") left.");
-        round.leave(player);
+        player.leave();
     }
 
     public void channelActive(ChannelHandlerContext ctx)

@@ -2,17 +2,37 @@ package de.lebk.thirtyone.game;
 
 import de.lebk.thirtyone.game.item.Deck;
 
+import java.util.UUID;
+
 public class Player
 {
-    private static final int DEFAULT_LIFE_COUNT = 3;
+    protected static final int DEFAULT_LIFE_COUNT = 3;
 
-    private Deck deck;
-    private int lifes;
+    protected final UUID uuid;
+    protected final Round round;
+    protected Deck deck;
+    protected int lifes;
 
-    protected Player()
+    protected Player(UUID uuid, Round round, Deck deck, int lifes)
     {
-        lifes = DEFAULT_LIFE_COUNT;
-        deck = new Deck(3);
+        this.uuid = uuid;
+        this.deck = deck;
+        this.lifes = lifes;
+        this.round = round;
     }
 
+    public UUID getUuid()
+    {
+        return uuid;
+    }
+
+    public Deck getDeck()
+    {
+        return deck;
+    }
+
+    public boolean equals(Object object)
+    {
+        return object instanceof Player && ((Player) object).uuid.equals(this.uuid);
+    }
 }

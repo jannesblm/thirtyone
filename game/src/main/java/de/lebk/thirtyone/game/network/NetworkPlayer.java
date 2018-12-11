@@ -1,39 +1,42 @@
 package de.lebk.thirtyone.game.network;
 
 import de.lebk.thirtyone.game.Player;
+import de.lebk.thirtyone.game.item.Deck;
+import de.lebk.thirtyone.game.network.exception.ConnectError;
 
 import java.util.UUID;
 
 public class NetworkPlayer extends Player
 {
-    private UUID uuid;
-    private boolean connected;
-    private boolean isLeader;
+    private boolean joined;
 
-    public NetworkPlayer()
+    public NetworkPlayer(NetworkRound round)
     {
-        uuid = UUID.randomUUID();
-        connected = false;
-        isLeader = false;
+        super(UUID.randomUUID(), round, new Deck(3), DEFAULT_LIFE_COUNT);
+
+        joined = false;
     }
 
-    public boolean isConnected()
+    public boolean isJoined()
     {
-        return connected;
+        return joined;
     }
 
-    void setLeader(boolean status)
+    public void join() throws ConnectError
     {
-        isLeader = status;
+        getCurrentRound().join(this);
+        joined = true;
     }
 
-    void setConnected()
+    public void leave()
     {
-        this.connected = true;
+        getCurrentRound().leave(this);
+        joined = false;
     }
 
-    public UUID getUuid()
+    public NetworkRound getCurrentRound()
     {
-        return uuid;
+        return (NetworkRound) round;
     }
+
 }
