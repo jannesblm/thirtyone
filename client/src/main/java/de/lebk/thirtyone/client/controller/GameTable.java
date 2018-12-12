@@ -3,7 +3,6 @@ package de.lebk.thirtyone.client.controller;
 import de.lebk.thirtyone.client.ObservableClient;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;

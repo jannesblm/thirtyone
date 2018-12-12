@@ -1,5 +1,7 @@
 package de.lebk.thirtyone.game;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
 
@@ -41,5 +43,20 @@ public class Round
 
         deck.swap(card, middleCard);
         middle.swap(middleCard, card);
+    }
+
+    public Set<Player> getPlayers()
+    {
+        return players;
+    }
+
+    public JsonElement toJson()
+    {
+        return new GsonBuilder().registerTypeAdapter(this.getClass(), new RoundSerializer()).create().toJsonTree(this);
+    }
+
+    public String toString()
+    {
+        return this.toJson().toString();
     }
 }

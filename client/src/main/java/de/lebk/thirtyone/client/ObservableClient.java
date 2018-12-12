@@ -32,6 +32,8 @@ public class ObservableClient extends ThreadedClient
     {
         channel = ch;
         connected.setValue(true);
+
+        channel.writeAndFlush(Message.prepare("HELLO"));
     }
 
     @Override

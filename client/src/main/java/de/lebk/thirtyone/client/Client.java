@@ -1,6 +1,7 @@
 package de.lebk.thirtyone.client;
 
 import de.lebk.thirtyone.game.network.MessageDecoder;
+import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -13,18 +14,17 @@ import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 
-
 public abstract class Client
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private String host;
-    private int port;
+    protected String host;
+    protected int port;
 
     public Client()
     {
-        this.host = "";
-        this.port = 0;
+        host = "";
+        port = 0;
     }
 
     public void connect() throws Exception
@@ -53,9 +53,11 @@ public abstract class Client
             LOG.info("Trying " + host + ":" + port);
 
             f.addListener((ChannelFutureListener) cf -> {
-                if (cf.isSuccess()) {
-                    onConnect(f.channel());
+                if (!cf.isSuccess()) {
+                    throw new ConnectError("Connection failed");
                 }
+
+                onConnect(f.channel());
             });
 
             f.channel().closeFuture().addListener((ChannelFutureListener) cf -> onDisconnect(f.cause())).sync();

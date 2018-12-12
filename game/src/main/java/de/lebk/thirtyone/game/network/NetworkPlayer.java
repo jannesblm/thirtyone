@@ -6,14 +6,11 @@ import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.channel.Channel;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class NetworkPlayer extends Player
 {
-    private boolean joined;
-    private Channel channel;
+    protected boolean joined;
 
     public NetworkPlayer(NetworkRound round)
     {
@@ -32,14 +29,14 @@ public class NetworkPlayer extends Player
         this.channel = channel;
         getRound().join(this);
 
-        channel.writeAndFlush(Message.prepare("HELLO"));
+        channel.writeAndFlush(Message.prepare("HELLO", this.toJson()));
 
         joined = true;
     }
 
     public void leave()
     {
-        this.channel = null;
+        channel = null;
         getRound().leave(this);
         joined = false;
     }
@@ -65,14 +62,5 @@ public class NetworkPlayer extends Player
                 e.printStackTrace();
             }
         });
-    }
-
-    public Optional<Channel> getChannel()
-    {
-        if (channel != null && channel.isWritable()) {
-            return Optional.of(channel);
-        }
-
-        return Optional.empty();
     }
 }

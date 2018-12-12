@@ -1,19 +1,13 @@
 package de.lebk.thirtyone.server;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import de.lebk.thirtyone.game.network.Message;
 import de.lebk.thirtyone.game.network.NetworkPlayer;
 import de.lebk.thirtyone.game.network.NetworkRound;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Map;
 
 public class PlayerHandler extends SimpleChannelInboundHandler<Message>
 {
@@ -54,6 +48,7 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
             } catch (Exception e) {
                 player.disconnect("Internal server error");
                 LOG.debug("Internal error on player join: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 

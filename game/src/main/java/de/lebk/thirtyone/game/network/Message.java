@@ -51,6 +51,11 @@ public class Message implements Serializable
         return new Message(command, json).toByteBuf();
     }
 
+    public static ByteBuf prepare(String command, Map map)
+    {
+        return new Message(command, map).toByteBuf();
+    }
+
     public static Optional<Message> parse(String data)
     {
         String[] tokens = DELIMITER.split(data, 2);
