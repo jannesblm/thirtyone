@@ -170,6 +170,10 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
         return deal;
     }
 
+    public Card get(int i){
+        return cards.get(i);
+    }
+
     public boolean swap(Card c1, Card c2)
     {
         if (cards.contains(c2)) {
