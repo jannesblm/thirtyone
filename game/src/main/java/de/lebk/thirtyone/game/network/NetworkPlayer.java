@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public class NetworkPlayer extends Player
 {
-    protected boolean joined;
-
     public NetworkPlayer(NetworkRound round)
     {
         super(UUID.randomUUID(), round, new Deck(3), DEFAULT_LIFE_COUNT);
@@ -19,17 +17,12 @@ public class NetworkPlayer extends Player
         joined = false;
     }
 
-    public boolean isJoined()
-    {
-        return joined;
-    }
-
     public void join(Channel channel) throws ConnectError
     {
         this.channel = channel;
         getRound().join(this);
 
-        channel.writeAndFlush(Message.prepare("HELLO", this.toJson()));
+        update();
 
         joined = true;
     }
@@ -62,5 +55,10 @@ public class NetworkPlayer extends Player
                 e.printStackTrace();
             }
         });
+    }
+
+    public void update()
+    {
+        getChannel().ifPresent(ch -> ch.writeAndFlush(Message.prepare("PLAYER", this.toJson())));
     }
 }

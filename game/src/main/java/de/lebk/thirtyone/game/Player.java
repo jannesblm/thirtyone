@@ -15,24 +15,20 @@ public class Player extends JsonSerializable<Player>
 {
     public static final int DEFAULT_LIFE_COUNT = 3;
 
-    private final UUID uuid;
+    protected UUID uuid;
     protected Channel channel;
-    protected final Round round;
+    protected Round round;
     protected Deck deck;
     protected int lifes;
+    protected boolean joined;
 
-    private Player()
+    public Player()
     {
         uuid = UUID.randomUUID();
-        round = new Round();
-    }
-
-    public Player(UUID uuid)
-    {
-        this.uuid = uuid;
-        deck = new Deck(3);
-        round = new Round();
+        deck = new Deck();
         lifes = DEFAULT_LIFE_COUNT;
+        round = new Round();
+        joined = false;
     }
 
     public Player(UUID uuid, Round round, Deck deck, int lifes)
@@ -43,14 +39,32 @@ public class Player extends JsonSerializable<Player>
         this.round = round;
     }
 
+    public static Player fromJson(JsonElement json)
+    {
+        return new GsonBuilder()
+                .registerTypeAdapter(Player.class, new PlayerDeserializer())
+                .create()
+                .fromJson(json, Player.class);
+    }
+
     public UUID getUuid()
     {
         return uuid;
     }
 
+    public boolean isJoined()
+    {
+        return joined;
+    }
+
     public Deck getDeck()
     {
         return deck;
+    }
+
+    public void setUuid(UUID uuid)
+    {
+        this.uuid = uuid;
     }
 
     public boolean equals(Object object)
@@ -67,9 +81,19 @@ public class Player extends JsonSerializable<Player>
         return Optional.empty();
     }
 
+    public void setDeck(Deck deck)
+    {
+        this.deck = deck;
+    }
+
     public int getLifes()
     {
         return lifes;
+    }
+
+    public void setChannel(Channel channel)
+    {
+        this.channel = channel;
     }
 
     public JsonElement toJson()
@@ -80,16 +104,18 @@ public class Player extends JsonSerializable<Player>
                 .toJsonTree(this);
     }
 
-    @Override
-    public Player fromJson(String json) {
-        return new GsonBuilder()
-                .registerTypeAdapter(this.getClass(), new PlayerDeserializer())
-                .create()
-                .fromJson(json, this.getClass());
+    public void setLifes(int lifes)
+    {
+        this.lifes = lifes;
     }
 
     public Round getRound()
     {
         return round;
+    }
+
+    public void setRound(Round round)
+    {
+        this.round = round;
     }
 }

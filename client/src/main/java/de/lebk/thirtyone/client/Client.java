@@ -1,5 +1,6 @@
 package de.lebk.thirtyone.client;
 
+import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.network.MessageDecoder;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.bootstrap.Bootstrap;
@@ -9,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
+import javafx.beans.property.SimpleObjectProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,11 +20,13 @@ public abstract class Client
 {
     private static final Logger LOG = LogManager.getLogger();
 
+    protected SimpleObjectProperty<Player> player;
     protected String host;
     protected int port;
 
     public Client()
     {
+        player = new SimpleObjectProperty<>(new Player());
         host = "";
         port = 0;
     }
@@ -44,7 +48,7 @@ public abstract class Client
                     ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
                     ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                     ch.pipeline().addLast(new MessageDecoder());
-                    ch.pipeline().addLast(new ClientHandler());
+                    ch.pipeline().addLast(new ClientHandler(player));
                 }
             });
 
@@ -81,4 +85,9 @@ public abstract class Client
     public abstract void onConnect(Channel ch);
 
     public abstract void onDisconnect(Throwable cause);
+
+    public SimpleObjectProperty<Player> getPlayerProperty()
+    {
+        return player;
+    }
 }

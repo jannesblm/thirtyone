@@ -9,7 +9,7 @@ import de.lebk.thirtyone.game.json.JsonSerializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Deck extends JsonSerializable implements Iterable<Card>, Comparable<Deck>
+public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comparable<Deck>
 {
     private final int limit;
     private final Random randomizer;
@@ -195,6 +195,9 @@ public class Deck extends JsonSerializable implements Iterable<Card>, Comparable
 
     public JsonElement toJson()
     {
-        return new GsonBuilder().registerTypeAdapter(this.getClass(), new DeckSerializer()).create().toJsonTree(this);
+        return new GsonBuilder()
+                .registerTypeAdapter(this.getClass(), new DeckSerializer())
+                .create()
+                .toJsonTree(this);
     }
 }

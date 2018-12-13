@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class Round extends JsonSerializable
+public class Round extends JsonSerializable<Round>
 {
     protected Set<Player> players;
     protected Deck middle;
@@ -52,9 +52,17 @@ public class Round extends JsonSerializable
         return players;
     }
 
+    public void setPlayers(Set<Player> players)
+    {
+        this.players = players;
+    }
+
     public JsonElement toJson()
     {
-        return new GsonBuilder().registerTypeAdapter(this.getClass(), new RoundSerializer()).create().toJsonTree(this);
+        return new GsonBuilder()
+                .registerTypeAdapter(this.getClass(), new RoundSerializer())
+                .create()
+                .toJsonTree(this);
     }
 
     public Deck getMiddle()
@@ -62,8 +70,18 @@ public class Round extends JsonSerializable
         return middle;
     }
 
+    public void setMiddle(Deck middle)
+    {
+        this.middle = middle;
+    }
+
     public boolean isStarted()
     {
         return started;
+    }
+
+    public void setStarted(boolean started)
+    {
+        this.started = started;
     }
 }

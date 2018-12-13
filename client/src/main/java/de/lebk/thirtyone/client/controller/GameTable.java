@@ -1,6 +1,8 @@
 package de.lebk.thirtyone.client.controller;
 
 import de.lebk.thirtyone.client.ObservableClient;
+import de.lebk.thirtyone.game.Round;
+import de.lebk.thirtyone.game.network.Message;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -14,6 +16,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,6 +29,8 @@ import java.util.Set;
 
 public class GameTable extends Application
 {
+    private static final Logger LOG = LogManager.getLogger();
+
     private ObservableClient client;
 
     @FXML
@@ -32,6 +38,15 @@ public class GameTable extends Application
 
     @FXML
     private Button connectButton;
+
+    @FXML
+    private Button startButton;
+
+    @FXML
+    private Button pushButton;
+
+    @FXML
+    private Button passButton;
 
     @FXML
     private HBox currentPlayerBox;
@@ -73,7 +88,39 @@ public class GameTable extends Application
         client = new ObservableClient();
 
         client.getConnectedProperty().addListener((observable, oldValue, newValue) ->
-                Platform.runLater(() -> connectButton.setText(newValue ? "Verlassen" : "Verbinden")));
+                Platform.runLater(() -> {
+                    if (newValue) {
+                        connectButton.setText("Verlassen");
+                    } else {
+                        connectButton.setText("Verbinden");
+                        startButton.setDisable(true);
+                        pushButton.setDisable(true);
+                        passButton.setDisable(true);
+                    }
+                }));
+
+        client.getPlayerProperty().addListener((observableValue, oldPlayer, player) -> {
+            LOG.debug("The player has changed: " + player);
+
+            Round round = player.getRound();
+
+            if (round.getPlayers().size() >= 1) {
+                startButton.setDisable(false);
+            } else {
+                startButton.setDisable(true);
+            }
+
+            LOG.debug("Round status: " + round.isStarted());
+
+            if (round.isStarted()) {
+                startButton.setDisable(true);
+                pushButton.setDisable(false);
+                passButton.setDisable(false);
+            } else {
+                pushButton.setDisable(true);
+                passButton.setDisable(true);
+            }
+        });
 
 
         refreshCurrentPlayerBox();
@@ -96,7 +143,7 @@ public class GameTable extends Application
 
             for (Node cardButton : cardButtons){
                 final String cardName = "back.png";
-                setCardForToggleButton(cardName,(ToggleButton) cardButton);
+                setCardForToggleButton(cardName, (ToggleButton) cardButton);
             }
         }
     }
@@ -191,5 +238,27 @@ public class GameTable extends Application
         toggleImage.setFitWidth(60);
 
         button.setGraphic(toggleImage);
+    }
+
+    public void onStartButtonClick(MouseEvent mouseEvent)
+    {
+        LOG.debug(client.getPlayerProperty().get().getChannel());
+        client.getPlayerProperty().get()
+                .getChannel()
+                .ifPresent(ch -> ch.writeAndFlush(Message.prepare("START")));
+    }
+
+    public void onPushButtonClick(MouseEvent mouseEvent)
+    {
+        client.getPlayerProperty().get()
+                .getChannel()
+                .ifPresent(ch -> ch.writeAndFlush(Message.prepare("PUSH")));
+    }
+
+    public void onPassButtonClick(MouseEvent mouseEvent)
+    {
+        client.getPlayerProperty().get()
+                .getChannel()
+                .ifPresent(ch -> ch.writeAndFlush(Message.prepare("PASS")));
     }
 }

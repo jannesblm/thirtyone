@@ -197,6 +197,12 @@
             <items>
                 <Button fx:id="connectButton" mnemonicParsing="false" onMouseClicked="#onConnectButtonClick"
                         text="Verbinden"/>
+                <Button fx:id="startButton" mnemonicParsing="false" onMouseClicked="#onStartButtonClick"
+                        text="Starten" disable="true"/>
+                <Button fx:id="pushButton" mnemonicParsing="false" onMouseClicked="#onPushButtonClick"
+                        text="Schieben" disable="true"/>
+                <Button fx:id="passButton" mnemonicParsing="false" onMouseClicked="#onPassButtonClick"
+                        text="Passen" disable="true"/>
             </items>
         </ToolBar>
         <TextArea fx:id="logArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4"/>

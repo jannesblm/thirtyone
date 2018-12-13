@@ -1,35 +1,34 @@
 package de.lebk.thirtyone.client;
 
 import de.lebk.thirtyone.game.Player;
-import de.lebk.thirtyone.game.Round;
-import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.network.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import javafx.beans.property.SimpleObjectProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.UuidUtil;
-
-import java.util.UUID;
 
 public class ClientHandler extends SimpleChannelInboundHandler<Message>
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private Player player;
+    private SimpleObjectProperty<Player> player;
+
+    public ClientHandler(SimpleObjectProperty<Player> player)
+    {
+        this.player = player;
+    }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Message message)
+    protected void channelRead0(ChannelHandlerContext ctx, Message message)
     {
-        if (player == null) {
-            boolean valid = message.getCommand().equalsIgnoreCase("HELLO")
-                    && message.get("uuid").isPresent();
+        LOG.debug("Got command: " + message.getCommand());
 
-            if (! valid) {
-                return;
-            }
+        if (message.getCommand().equalsIgnoreCase("PLAYER")) {
+            Player newPlayer = Player.fromJson(message.getJSON());
+            newPlayer.setChannel(ctx.channel());
 
-            player = new Player(UUID.fromString(message.get("uuid").get().getAsString()));
+            this.player.setValue(newPlayer);
         }
     }
 

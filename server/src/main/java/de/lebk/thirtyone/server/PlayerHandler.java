@@ -52,7 +52,20 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
             }
         }
 
+        NetworkRound round = player.getRound();
 
+        try {
+            switch (message.getCommand()) {
+                case "START":
+                    if (!round.isStarted() && round.playerCount() >= 1) {
+                        round.start();
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            player.disconnect("Internal server error");
+            LOG.debug("Internal error on command handling: " + e.getMessage());
+        }
 
     }
 

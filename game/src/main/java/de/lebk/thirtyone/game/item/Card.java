@@ -1,9 +1,8 @@
 package de.lebk.thirtyone.game.item;
 
-import com.google.gson.Gson;
 import de.lebk.thirtyone.game.json.JsonSerializable;
 
-public class Card extends JsonSerializable implements Comparable<Card>
+public class Card extends JsonSerializable<Card> implements Comparable<Card>
 {
     static final int CARD_VALUE_MAX = 11;
     static final int CARD_VALUE_MIN = 7;
