@@ -4,13 +4,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
+import de.lebk.thirtyone.game.json.JsonSerializable;
+import de.lebk.thirtyone.game.json.RoundSerializer;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class Round
+public class Round extends JsonSerializable
 {
     protected Set<Player> players;
     protected Deck middle;
@@ -55,8 +57,13 @@ public class Round
         return new GsonBuilder().registerTypeAdapter(this.getClass(), new RoundSerializer()).create().toJsonTree(this);
     }
 
-    public String toString()
+    public Deck getMiddle()
     {
-        return this.toJson().toString();
+        return middle;
+    }
+
+    public boolean isStarted()
+    {
+        return started;
     }
 }

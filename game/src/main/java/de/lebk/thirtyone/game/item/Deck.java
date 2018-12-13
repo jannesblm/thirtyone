@@ -1,11 +1,15 @@
 package de.lebk.thirtyone.game.item;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import de.lebk.thirtyone.game.json.DeckSerializer;
+import de.lebk.thirtyone.game.json.JsonSerializable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Deck implements Iterable<Card>, Comparable<Deck>
+public class Deck extends JsonSerializable implements Iterable<Card>, Comparable<Deck>
 {
     private final int limit;
     private final Random randomizer;
@@ -177,5 +181,20 @@ public class Deck implements Iterable<Card>, Comparable<Deck>
         }
 
         return Collections.replaceAll(cards, c1, c2);
+    }
+
+    public List<Card> getCards()
+    {
+        return cards;
+    }
+
+    public int getLimit()
+    {
+        return limit;
+    }
+
+    public JsonElement toJson()
+    {
+        return new GsonBuilder().registerTypeAdapter(this.getClass(), new DeckSerializer()).create().toJsonTree(this);
     }
 }

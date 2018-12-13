@@ -3,14 +3,17 @@ package de.lebk.thirtyone.game;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import de.lebk.thirtyone.game.item.Deck;
+import de.lebk.thirtyone.game.json.JsonSerializable;
+import de.lebk.thirtyone.game.json.PlayerDeserializer;
+import de.lebk.thirtyone.game.json.PlayerSerializer;
 import io.netty.channel.Channel;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class Player
+public class Player extends JsonSerializable<Player>
 {
-    protected static final int DEFAULT_LIFE_COUNT = 3;
+    public static final int DEFAULT_LIFE_COUNT = 3;
 
     private final UUID uuid;
     protected Channel channel;
@@ -18,7 +21,21 @@ public class Player
     protected Deck deck;
     protected int lifes;
 
-    protected Player(UUID uuid, Round round, Deck deck, int lifes)
+    private Player()
+    {
+        uuid = UUID.randomUUID();
+        round = new Round();
+    }
+
+    public Player(UUID uuid)
+    {
+        this.uuid = uuid;
+        deck = new Deck(3);
+        round = new Round();
+        lifes = DEFAULT_LIFE_COUNT;
+    }
+
+    public Player(UUID uuid, Round round, Deck deck, int lifes)
     {
         this.uuid = uuid;
         this.deck = deck;
@@ -57,12 +74,18 @@ public class Player
 
     public JsonElement toJson()
     {
-        return new GsonBuilder().registerTypeAdapter(this.getClass(), new PlayerSerializer()).create().toJsonTree(this);
+        return new GsonBuilder()
+                .registerTypeAdapter(this.getClass(), new PlayerSerializer())
+                .create()
+                .toJsonTree(this);
     }
 
-    public String toString()
-    {
-        return this.toJson().toString();
+    @Override
+    public Player fromJson(String json) {
+        return new GsonBuilder()
+                .registerTypeAdapter(this.getClass(), new PlayerDeserializer())
+                .create()
+                .fromJson(json, this.getClass());
     }
 
     public Round getRound()

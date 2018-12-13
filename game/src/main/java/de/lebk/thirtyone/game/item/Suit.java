@@ -9,12 +9,6 @@ public enum Suit implements SuitType
 {
     CLUBS {
         @Override
-        public URL getImageURL()
-        {
-            return this.getClass().getResource("/clubs.png");
-        }
-
-        @Override
         public int getRank()
         {
             return 3;
@@ -28,12 +22,6 @@ public enum Suit implements SuitType
     },
 
     SPADES {
-        @Override
-        public URL getImageURL()
-        {
-            return this.getClass().getResource("/spades.png");
-        }
-
         @Override
         public int getRank()
         {
@@ -49,12 +37,6 @@ public enum Suit implements SuitType
 
     HEARTS {
         @Override
-        public URL getImageURL()
-        {
-            return this.getClass().getResource("/hearts.png");
-        }
-
-        @Override
         public int getRank()
         {
             return 1;
@@ -69,12 +51,6 @@ public enum Suit implements SuitType
 
     DIAMONDS {
         @Override
-        public URL getImageURL()
-        {
-            return this.getClass().getResource("/diamonds.png");
-        }
-
-        @Override
         public int getRank()
         {
             return 0;
@@ -86,9 +62,4 @@ public enum Suit implements SuitType
             return "Diamonds";
         }
     };
-
-    public BufferedImage getImage() throws IOException
-    {
-        return ImageIO.read(this.getImageURL());
-    }
 }

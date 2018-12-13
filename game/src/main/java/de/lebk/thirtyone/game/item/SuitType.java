@@ -4,7 +4,5 @@ import java.net.URL;
 
 public interface SuitType
 {
-    URL getImageURL();
-
     int getRank();
 }

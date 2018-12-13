@@ -1,6 +1,7 @@
-package de.lebk.thirtyone.game;
+package de.lebk.thirtyone.game.json;
 
 import com.google.gson.*;
+import de.lebk.thirtyone.game.Player;
 
 import java.lang.reflect.Type;
 
@@ -12,8 +13,8 @@ public class PlayerSerializer implements JsonSerializer<Player>
         JsonObject result = new JsonObject();
 
         result.add("uuid", new JsonPrimitive(player.getUuid().toString()));
-        result.add("deck", new Gson().toJsonTree(player.getDeck()));
-        /*result.add("round", player.getRound().toJson());*/
+        result.add("deck", player.getDeck().toJson());
+        result.add("round", player.getRound().toJson());
         result.add("lifes", new JsonPrimitive(player.getLifes()));
 
         return result;

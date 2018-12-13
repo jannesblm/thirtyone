@@ -1,8 +1,9 @@
 package de.lebk.thirtyone.game.item;
 
 import com.google.gson.Gson;
+import de.lebk.thirtyone.game.json.JsonSerializable;
 
-public class Card implements Comparable<Card>
+public class Card extends JsonSerializable implements Comparable<Card>
 {
     static final int CARD_VALUE_MAX = 11;
     static final int CARD_VALUE_MIN = 7;
@@ -68,12 +69,6 @@ public class Card implements Comparable<Card>
     public boolean equals(Object object)
     {
         return object instanceof Card && ((Card) object).compareTo(this) == 0;
-    }
-    
-    @Override
-    public String toString()
-    {
-        return new Gson().toJson(this);
     }
 
     public String getImageName()
