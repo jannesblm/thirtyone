@@ -200,4 +200,13 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
                 .create()
                 .toJsonTree(this);
     }
+
+    public Optional<Card> get(int index)
+    {
+        if (cards.size() > index) {
+            return Optional.of(cards.get(index));
+        }
+
+        return Optional.empty();
+    }
 }

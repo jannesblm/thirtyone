@@ -2,6 +2,8 @@ package de.lebk.thirtyone.client.controller;
 
 import de.lebk.thirtyone.client.ObservableClient;
 import de.lebk.thirtyone.game.Round;
+import de.lebk.thirtyone.game.item.Card;
+import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.network.Message;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -120,6 +122,13 @@ public class GameTable extends Application
                 pushButton.setDisable(true);
                 passButton.setDisable(true);
             }
+
+            if (player.getDeck().size() > 0) {
+                LOG.debug("Refresh player box");
+                Platform.runLater(() -> {
+                    refreshCurrentPlayerBox();
+                });
+            }
         });
 
 
@@ -208,15 +217,15 @@ public class GameTable extends Application
         logArea.appendText(text + System.lineSeparator());
     }
 
-    public void refreshCurrentPlayerBox(){
-
-        //TODO Load CardSet from Client
-        this.getClass().getClassLoader().getResource("2_of_clubs.png");
-
+    public void refreshCurrentPlayerBox()
+    {
         Set<Node> cardButtons = currentPlayerBox.lookupAll(".cardButton");
-        for (Node cardButton : cardButtons){
-            final String cardName = "2_of_clubs.png";
-            setCardForToggleButton(cardName,(ToggleButton) cardButton);
+        Deck deck = client.getPlayerProperty().get().getDeck();
+        int i = 0;
+        for (Node cardButton : cardButtons) {
+            // TODO: Unsafe
+            deck.get(i).ifPresent(card -> setCardForToggleButton(card.getImageName(), (ToggleButton) cardButton));
+            i++;
         }
     }
 

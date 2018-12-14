@@ -88,7 +88,7 @@ public class Card extends JsonSerializable<Card> implements Comparable<Card>
         }
 
         url.append("_of_");
-        url.append(symbol.name());
+        url.append(suit.name());
         url.append(".png");
 
         return url.toString();
