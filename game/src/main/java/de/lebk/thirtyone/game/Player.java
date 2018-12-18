@@ -69,7 +69,8 @@ public class Player extends JsonSerializable<Player>
 
     public boolean equals(Object object)
     {
-        return object instanceof Player && ((Player) object).uuid.equals(this.uuid) && ((Player) object).getDeck().equals(this.getDeck());
+        return object instanceof Player
+                && ((Player) object).uuid.equals(this.uuid);
     }
 
     public Optional<Channel> getChannel()

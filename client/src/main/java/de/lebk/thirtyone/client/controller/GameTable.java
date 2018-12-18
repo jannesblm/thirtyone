@@ -1,8 +1,7 @@
 package de.lebk.thirtyone.client.controller;
 
-import de.lebk.thirtyone.client.ObservableClient;
+import de.lebk.thirtyone.client.ThreadedClient;
 import de.lebk.thirtyone.game.Round;
-import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.network.Message;
 import javafx.application.Application;
@@ -33,7 +32,7 @@ public class GameTable extends Application
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private ObservableClient client;
+    private ThreadedClient client;
 
     @FXML
     private TextArea logArea;
@@ -87,7 +86,7 @@ public class GameTable extends Application
     @FXML
     private void initialize()
     {
-        client = new ObservableClient();
+        client = new ThreadedClient();
 
         client.getConnectedProperty().addListener((observable, oldValue, newValue) ->
                 Platform.runLater(() -> {
@@ -98,10 +97,13 @@ public class GameTable extends Application
                         startButton.setDisable(true);
                         pushButton.setDisable(true);
                         passButton.setDisable(true);
+
+                        initCards();
                     }
                 }));
 
         client.getPlayerProperty().addListener((observableValue, oldPlayer, player) -> {
+
             LOG.debug("The player has changed: " + player);
 
             Round round = player.getRound();
@@ -125,9 +127,7 @@ public class GameTable extends Application
 
             if (player.getDeck().size() > 0) {
                 LOG.debug("Refresh player box");
-                Platform.runLater(() -> {
-                    refreshCurrentPlayerBox();
-                });
+                Platform.runLater(this::refreshCurrentPlayerBox);
             }
         });
 
