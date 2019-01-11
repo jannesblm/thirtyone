@@ -15,12 +15,14 @@ import java.util.Set;
 public class Round extends JsonSerializable<Round>
 {
     protected Set<Player> players;
-    protected Deck middle;
-    protected boolean started;
+    protected Player currentPlayer;
+    private Deck middle;
+    private boolean started;
 
     public Round()
     {
         players = Collections.synchronizedSet(new HashSet<>());
+        middle = new Deck();
     }
 
     public Optional<Player> getPlayer(Player player)

@@ -3,7 +3,6 @@ package de.lebk.thirtyone.game.network;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.Round;
 import de.lebk.thirtyone.game.item.Deck;
-import de.lebk.thirtyone.game.item.DeckIntegrityException;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
 
 public class NetworkRound extends Round
@@ -13,7 +12,7 @@ public class NetworkRound extends Round
 
     public NetworkRound()
     {
-        staple = Deck.newDeck();
+        staple = Deck.newSkat();
     }
 
     public void join(NetworkPlayer player) throws ConnectError
@@ -37,8 +36,10 @@ public class NetworkRound extends Round
         }
     }
 
-    public void start() throws DeckIntegrityException
+    public void start()
     {
+        setMiddle(staple.deal(3));
+
         for (Player p : players) {
             p.setDeck(staple.deal(3));
             p.getRound().setStarted(true);

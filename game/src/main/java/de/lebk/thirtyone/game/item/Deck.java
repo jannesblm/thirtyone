@@ -23,12 +23,12 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
 
     public Deck()
     {
-        this(0);
+        this(-1);
     }
 
     public Deck(int limit)
     {
-        if (limit < 0) {
+        if (limit < -1) {
             throw new IllegalArgumentException("Invalid range for limit argument");
         }
 
@@ -42,7 +42,7 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
      *
      * @return A new, shuffled Skat deck
      */
-    public static Deck newDeck()
+    public static Deck newSkat()
     {
         Deck deck = new Deck(32);
 
@@ -113,7 +113,7 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
      */
     private boolean violatesBounds(int change)
     {
-        return cards.size() + change > limit || cards.size() + change < 0;
+        return (limit != -1 && cards.size() + change > limit) || cards.size() + change < 0;
     }
 
     /**
@@ -163,12 +163,12 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
         return Optional.of(cards.remove(0));
     }
 
-    public Deck deal(int amount) throws DeckIntegrityException
+    public Deck deal(int amount)
     {
         Deck deal = new Deck(amount);
 
         for (int i = 0; i < amount; i++) {
-            deal.add(pop().orElseThrow(() -> new DeckIntegrityException("No cards remaining!")));
+            pop().ifPresent(deal::add);
         }
 
         return deal;

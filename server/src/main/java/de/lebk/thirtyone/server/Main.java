@@ -11,7 +11,7 @@ public class Main
     {
         LOG.info("Starting Thirtyone Server");
 
-        Server server = new Server(25566);
+        Server server = new Server(9942);
 
         try {
             server.run();

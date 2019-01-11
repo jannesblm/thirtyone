@@ -9,9 +9,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,8 +18,8 @@ public class ThreadedClient extends Client
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private BooleanProperty connected;
-    private SimpleObjectProperty<Player> player;
+    private ObservedProperty<Boolean> connected;
+    private ObservedProperty<Player> player;
 
     private Channel channel;
     private Thread thread;
@@ -30,8 +27,8 @@ public class ThreadedClient extends Client
     public ThreadedClient()
     {
         super();
-        connected = new SimpleBooleanProperty(false);
-        player = new SimpleObjectProperty<>(new Player());
+        connected = new ObservedProperty<>(false);
+        player = new ObservedProperty<>(new Player());
     }
 
     public void connectAsync()
@@ -70,7 +67,7 @@ public class ThreadedClient extends Client
     public void onConnect(Channel ch)
     {
         channel = ch;
-        connected.setValue(true);
+        connected.change(true);
 
         channel.writeAndFlush(Message.prepare("HELLO"));
     }
@@ -78,15 +75,15 @@ public class ThreadedClient extends Client
     @Override
     public void onDisconnect(Throwable cause)
     {
-        connected.setValue(false);
+        connected.change(false);
     }
 
-    public BooleanProperty getConnectedProperty()
+    public ObservedProperty<Boolean> getConnectedProperty()
     {
         return connected;
     }
 
-    public SimpleObjectProperty<Player> getPlayerProperty()
+    public ObservedProperty<Player> getPlayerProperty()
     {
         return player;
     }

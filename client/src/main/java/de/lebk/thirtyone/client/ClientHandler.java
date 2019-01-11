@@ -4,7 +4,6 @@ import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.network.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import javafx.beans.property.SimpleObjectProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,9 +11,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
 {
     private static final Logger LOG = LogManager.getLogger();
 
-    private SimpleObjectProperty<Player> player;
+    private ObservedProperty<Player> player;
 
-    public ClientHandler(SimpleObjectProperty<Player> player)
+    public ClientHandler(ObservedProperty<Player> player)
     {
         this.player = player;
     }
@@ -28,7 +27,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
             Player newPlayer = Player.fromJson(message.getJSON());
             newPlayer.setChannel(ctx.channel());
 
-            this.player.setValue(newPlayer);
+            this.player.change(newPlayer);
         }
     }
 

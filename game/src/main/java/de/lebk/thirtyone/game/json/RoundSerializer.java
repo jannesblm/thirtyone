@@ -26,7 +26,7 @@ public class RoundSerializer implements JsonSerializer<Round>
         }
 
         result.add("players", players);
-        result.add("middle", new Gson().toJsonTree(round.getMiddle()));
+        result.add("middle", round.getMiddle().toJson());
         result.add("started", new JsonPrimitive(round.isStarted()));
 
         return result;
