@@ -39,11 +39,6 @@ public class NetworkPlayer extends Player
         return (NetworkRound) round;
     }
 
-    public void send(Message message)
-    {
-        getChannel().ifPresent(ch -> ch.writeAndFlush(message.toByteBuf()));
-    }
-
     public void disconnect(String reason)
     {
         send(new Message("BYE", Map.of("reason", reason)));
@@ -59,6 +54,6 @@ public class NetworkPlayer extends Player
 
     public void update()
     {
-        getChannel().ifPresent(ch -> ch.writeAndFlush(Message.prepare("PLAYER", this.toJson())));
+        send(new Message("PLAYER", this.toJson()));
     }
 }

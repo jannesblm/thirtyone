@@ -6,6 +6,7 @@ import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.json.JsonSerializable;
 import de.lebk.thirtyone.game.json.PlayerDeserializer;
 import de.lebk.thirtyone.game.json.PlayerSerializer;
+import de.lebk.thirtyone.game.network.Message;
 import io.netty.channel.Channel;
 
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class Player extends JsonSerializable<Player>
     protected Deck deck;
     protected int lifes;
     protected boolean joined;
+    protected boolean passed;
 
     public Player()
     {
@@ -118,5 +120,20 @@ public class Player extends JsonSerializable<Player>
     public void setRound(Round round)
     {
         this.round = round;
+    }
+
+    public void send(Message message)
+    {
+        getChannel().ifPresent(ch -> ch.writeAndFlush(message.toByteBuf()));
+    }
+
+    public boolean isPassed()
+    {
+        return this.passed;
+    }
+
+    public void setPassed(boolean passed)
+    {
+        this.passed = passed;
     }
 }

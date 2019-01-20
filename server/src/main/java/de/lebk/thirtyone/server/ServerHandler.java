@@ -1,5 +1,6 @@
 package de.lebk.thirtyone.server;
 
+import de.lebk.thirtyone.game.GameException;
 import de.lebk.thirtyone.game.network.Message;
 import de.lebk.thirtyone.game.network.NetworkPlayer;
 import de.lebk.thirtyone.game.network.NetworkRound;
@@ -9,13 +10,13 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class PlayerHandler extends SimpleChannelInboundHandler<Message>
+public class ServerHandler extends SimpleChannelInboundHandler<Message>
 {
     private static final Logger LOG = LogManager.getLogger();
 
     private final NetworkPlayer player;
 
-    PlayerHandler(NetworkRound round)
+    ServerHandler(NetworkRound round)
     {
         player = new NetworkPlayer(round);
     }
@@ -61,10 +62,20 @@ public class PlayerHandler extends SimpleChannelInboundHandler<Message>
                         round.start();
                     }
                     break;
+                case "PUSH":
+                    round.setCurrentPlayer(round.nextPlayer());
+                    round.updateAll();
+                    break;
+                case "PASS":
+                    player.setPassed(true);
+                    round.setCurrentPlayer(round.nextPlayer());
+                    round.updateAll();
+                    break;
+                case "SWAP":
+                    break;
             }
-        } catch (Exception e) {
-            player.disconnect("Internal server error");
-            LOG.debug("Internal error on command handling: " + e.getMessage());
+        } catch (GameException exception) {
+            LOG.debug(exception);
         }
 
     }

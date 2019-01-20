@@ -32,6 +32,10 @@ public class PlayerDeserializer implements JsonDeserializer<Player>
             player.setLifes(playerObject.get("lifes").getAsInt());
         }
 
+        if (playerObject.has("passed")) {
+            player.setPassed(playerObject.get("passed").getAsBoolean());
+        }
+
         if (playerObject.has("round")) {
             player.setRound(
                     new GsonBuilder()

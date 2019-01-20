@@ -2,7 +2,6 @@ package de.lebk.thirtyone.server;
 
 import de.lebk.thirtyone.game.network.MessageDecoder;
 import de.lebk.thirtyone.game.network.NetworkRound;
-import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -52,7 +51,7 @@ class Server
                             ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
                             ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                             ch.pipeline().addLast(new MessageDecoder());
-                            ch.pipeline().addLast(new PlayerHandler(round));
+                            ch.pipeline().addLast(new ServerHandler(round));
                         }
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE, true);

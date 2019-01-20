@@ -199,6 +199,8 @@
                         text="Verbinden"/>
                 <Button fx:id="startButton" mnemonicParsing="false" onMouseClicked="#onStartButtonClick"
                         text="Starten" disable="true"/>
+                <Button fx:id="swapButton" mnemonicParsing="false" onMouseClicked="#onSwapButtonClick"
+                        text="Tauschen" disable="true"/>
                 <Button fx:id="pushButton" mnemonicParsing="false" onMouseClicked="#onPushButtonClick"
                         text="Schieben" disable="true"/>
                 <Button fx:id="passButton" mnemonicParsing="false" onMouseClicked="#onPassButtonClick"

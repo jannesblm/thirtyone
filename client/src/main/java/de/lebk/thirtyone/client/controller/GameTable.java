@@ -1,5 +1,6 @@
 package de.lebk.thirtyone.client.controller;
 
+import com.google.gson.JsonArray;
 import de.lebk.thirtyone.client.ThreadedClient;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.Round;
@@ -10,6 +11,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,7 +24,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public class GameTable extends Application
@@ -39,6 +43,9 @@ public class GameTable extends Application
 
     @FXML
     private Button startButton;
+
+    @FXML
+    private Button swapButton;
 
     @FXML
     private Button pushButton;
@@ -91,6 +98,7 @@ public class GameTable extends Application
             } else {
                 connectButton.setText("Verbinden");
                 startButton.setDisable(true);
+                swapButton.setDisable(true);
                 pushButton.setDisable(true);
                 passButton.setDisable(true);
 
@@ -103,6 +111,9 @@ public class GameTable extends Application
 
             Round round = player.getRound();
 
+            LOG.debug("Current player is: " +
+                    (round.getCurrentPlayer().isPresent() ? round.getCurrentPlayer().get() : "-"));
+
             if (round.getPlayers().size() >= 1) {
                 startButton.setDisable(false);
             } else {
@@ -113,17 +124,25 @@ public class GameTable extends Application
 
             if (round.isStarted()) {
                 startButton.setDisable(true);
-                pushButton.setDisable(false);
-                passButton.setDisable(false);
+
+                if (round.getCurrentPlayer().isPresent()
+                        && round.getCurrentPlayer().get().equals(player)) {
+                    swapButton.setDisable(false);
+                    passButton.setDisable(player.isPassed());
+                    pushButton.setDisable(false);
+                } else {
+                    swapButton.setDisable(true);
+                    pushButton.setDisable(true);
+                    passButton.setDisable(true);
+                }
+
             } else {
+                swapButton.setDisable(true);
                 pushButton.setDisable(true);
                 passButton.setDisable(true);
             }
 
-            if (player.getDeck().size() > 0) {
-                LOG.debug("Refresh player box");
-                Platform.runLater(this::refreshAllBoxes);
-            }
+            Platform.runLater(this::refreshAllBoxes);
         }));
 
         emptyAllBoxes();
@@ -207,28 +226,58 @@ public class GameTable extends Application
 
         refreshBox(currentPlayerBox, player.getDeck());
         refreshBox(middleBox, player.getRound().getMiddle());
+
+        List<Player> opponents = player.getRound()
+                .getPlayers()
+                .stream()
+                .filter(p -> !p.equals(player))
+                .collect(Collectors.toList());
+
+        List<HBox> opponentBoxes = List.of(leftOpponentBox, middleOpponentBox, rightOpponentBox);
+
+        for (int i = 0; i < opponents.size(); i++) {
+            if (i >= opponentBoxes.size()) {
+                break;
+            }
+
+            refreshBox(opponentBoxes.get(i), opponents.get(i).getDeck());
+        }
     }
 
 
     public void onStartButtonClick(MouseEvent mouseEvent)
     {
         LOG.debug(client.getPlayerProperty().getValue().getChannel());
-        client.getPlayerProperty().getValue()
-                .getChannel()
-                .ifPresent(ch -> ch.writeAndFlush(Message.prepare("START")));
+        client.getPlayerProperty().getValue().send(new Message("START"));
     }
 
     public void onPushButtonClick(MouseEvent mouseEvent)
     {
-        client.getPlayerProperty().getValue()
-                .getChannel()
-                .ifPresent(ch -> ch.writeAndFlush(Message.prepare("PUSH")));
+        client.getPlayerProperty().getValue().send(new Message("PUSH"));
     }
 
     public void onPassButtonClick(MouseEvent mouseEvent)
     {
-        client.getPlayerProperty().getValue()
-                .getChannel()
-                .ifPresent(ch -> ch.writeAndFlush(Message.prepare("PASS")));
+        client.getPlayerProperty().getValue().send(new Message("PASS"));
+    }
+
+    public Optional<Node> getSelected(Node node)
+    {
+        return node.lookupAll(".cardButton")
+                .stream()
+                .filter(n -> ((ToggleButton) n).isSelected())
+                .findFirst();
+    }
+
+    public void onSwapButtonClick(MouseEvent mouseEvent)
+    {
+        Optional<Node> playerCard = getSelected(currentPlayerBox);
+        Optional<Node> middleCard = getSelected(middleBox);
+
+        if (!playerCard.isPresent() || !middleCard.isPresent()) {
+            return;
+        }
+
+        client.getPlayerProperty().getValue().send(new Message("SWAP", new JsonArray()));
     }
 }

@@ -2,7 +2,6 @@ package de.lebk.thirtyone.game;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.json.JsonSerializable;
 import de.lebk.thirtyone.game.json.RoundSerializer;
@@ -16,8 +15,8 @@ public class Round extends JsonSerializable<Round>
 {
     protected Set<Player> players;
     protected Player currentPlayer;
-    private Deck middle;
-    private boolean started;
+    protected Deck middle;
+    protected boolean started;
 
     public Round()
     {
@@ -33,20 +32,6 @@ public class Round extends JsonSerializable<Round>
     public int playerCount()
     {
         return players.size();
-    }
-
-    public void swap(Player p, Card card, Card middleCard) throws GameException
-    {
-        Optional<Player> player = getPlayer(p);
-
-        if (!player.isPresent()) {
-            throw new GameException("Swapping player was not found in this round!");
-        }
-
-        Deck deck = player.get().getDeck();
-
-        deck.swap(card, middleCard);
-        middle.swap(middleCard, card);
     }
 
     public Set<Player> getPlayers()
@@ -85,5 +70,19 @@ public class Round extends JsonSerializable<Round>
     public void setStarted(boolean started)
     {
         this.started = started;
+    }
+
+    public Optional<Player> getCurrentPlayer()
+    {
+        if (currentPlayer == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(currentPlayer);
+    }
+
+    public void setCurrentPlayer(Player currentPlayer)
+    {
+        this.currentPlayer = currentPlayer;
     }
 }

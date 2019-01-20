@@ -7,6 +7,7 @@ import de.lebk.thirtyone.game.item.Deck;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,7 +46,26 @@ public class RoundDeserializer implements JsonDeserializer<Round>
                     player.setLifes(playerObject.get("lifes").getAsInt());
                 }
 
+                if (playerObject.has("passed")) {
+                    player.setPassed(playerObject.get("passed").getAsBoolean());
+                }
+
                 players.add(player);
+            }
+
+            if (roundObject.has("currentPlayer")) {
+                JsonObject currentPlayerObject = roundObject.get("currentPlayer").getAsJsonObject();
+
+                if (currentPlayerObject.has("uuid")) {
+                    UUID uuid = UUID.fromString(currentPlayerObject.get("uuid").getAsString());
+                    Optional<Player> currentPlayer = players.stream()
+                            .filter(p -> p.getUuid()
+                                    .equals(uuid))
+                            .findFirst();
+
+                    currentPlayer.ifPresent(round::setCurrentPlayer);
+                }
+
             }
 
             round.setPlayers(players);
