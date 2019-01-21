@@ -48,7 +48,7 @@ class Server
                         @Override
                         public void initChannel(SocketChannel ch)
                         {
-                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                            ch.pipeline().addLast(new LineBasedFrameDecoder(3072));
                             ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                             ch.pipeline().addLast(new MessageDecoder());
                             ch.pipeline().addLast(new ServerHandler(round));
