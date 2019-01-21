@@ -1,5 +1,6 @@
 package de.lebk.thirtyone.game.network;
 
+import com.google.gson.JsonPrimitive;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
@@ -12,7 +13,7 @@ public class NetworkPlayer extends Player
 {
     public NetworkPlayer(NetworkRound round)
     {
-        super(UUID.randomUUID(), round, new Deck(3), DEFAULT_LIFE_COUNT);
+        super(UUID.randomUUID(), "New player", round, new Deck(3), DEFAULT_LIFE_COUNT);
 
         joined = false;
     }
@@ -22,7 +23,7 @@ public class NetworkPlayer extends Player
         this.channel = channel;
         getRound().join(this);
 
-        update();
+        update("Einer aktiven Runde beigetreten.");
 
         joined = true;
     }
@@ -52,8 +53,12 @@ public class NetworkPlayer extends Player
         });
     }
 
-    public void update()
+    public void update(final String cause)
     {
         send(new Message("PLAYER", this.toJson()));
+
+        if (cause != null) {
+            send(new Message("TELL", new JsonPrimitive(cause)));
+        }
     }
 }

@@ -24,6 +24,10 @@ public class PlayerDeserializer implements JsonDeserializer<Player>
             player.setUuid(UUID.fromString(playerObject.get("uuid").getAsString()));
         }
 
+        if (playerObject.has("name")) {
+            player.setName(playerObject.get("name").getAsString());
+        }
+
         if (playerObject.has("deck")) {
             player.setDeck(new Gson().fromJson(playerObject.get("deck"), Deck.class));
         }

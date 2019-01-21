@@ -3,15 +3,12 @@ package de.lebk.thirtyone.game.json;
 import com.google.gson.*;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.Round;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import de.lebk.thirtyone.game.item.Deck;
 
 import java.lang.reflect.Type;
 
 public class RoundSerializer implements JsonSerializer<Round>
 {
-    private static final Logger LOG = LogManager.getLogger();
-
     @Override
     public JsonElement serialize(Round round, Type type, JsonSerializationContext jsonSerializationContext)
     {
@@ -22,7 +19,13 @@ public class RoundSerializer implements JsonSerializer<Round>
             JsonObject playerObject = new JsonObject();
 
             playerObject.add("uuid", new JsonPrimitive(player.getUuid().toString()));
-            playerObject.add("deck", player.getDeck().toJson());
+
+            if (round.isStarted()) {
+                playerObject.add("deck", new Deck(3).toJson());
+            } else {
+                playerObject.add("deck", player.getDeck().toJson());
+            }
+
             playerObject.add("passed", new JsonPrimitive(player.isPassed()));
             playerObject.add("lifes", new JsonPrimitive(player.getLifes()));
 

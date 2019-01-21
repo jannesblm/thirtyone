@@ -17,6 +17,7 @@ public class Player extends JsonSerializable<Player>
     public static final int DEFAULT_LIFE_COUNT = 3;
 
     protected UUID uuid;
+    protected String name;
     protected Channel channel;
     protected Round round;
     protected Deck deck;
@@ -27,15 +28,17 @@ public class Player extends JsonSerializable<Player>
     public Player()
     {
         uuid = UUID.randomUUID();
+        name = "Spieler";
         deck = new Deck();
         lifes = DEFAULT_LIFE_COUNT;
         round = new Round();
         joined = false;
     }
 
-    public Player(UUID uuid, Round round, Deck deck, int lifes)
+    public Player(UUID uuid, String name, Round round, Deck deck, int lifes)
     {
         this.uuid = uuid;
+        this.name = name;
         this.deck = deck;
         this.lifes = lifes;
         this.round = round;
@@ -82,6 +85,16 @@ public class Player extends JsonSerializable<Player>
         }
 
         return Optional.empty();
+    }
+
+    public boolean isOnTurn()
+    {
+        return getRound().getCurrentPlayer().isPresent() && getRound().getCurrentPlayer().get().equals(this);
+    }
+
+    public float getPoints()
+    {
+        return deck.getPoints();
     }
 
     public void setDeck(Deck deck)
@@ -135,5 +148,15 @@ public class Player extends JsonSerializable<Player>
     public void setPassed(boolean passed)
     {
         this.passed = passed;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }

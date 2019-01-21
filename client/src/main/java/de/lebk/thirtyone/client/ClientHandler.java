@@ -12,10 +12,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
     private static final Logger LOG = LogManager.getLogger();
 
     private ObservedProperty<Player> player;
+    private ObservedProperty<String> message;
 
-    public ClientHandler(ObservedProperty<Player> player)
+    public ClientHandler(ObservedProperty<Player> player, ObservedProperty<String> message)
     {
         this.player = player;
+        this.message = message;
     }
 
     @Override
@@ -23,11 +25,16 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
     {
         LOG.debug("Got command: " + message.getCommand());
 
-        if (message.getCommand().equalsIgnoreCase("PLAYER")) {
-            Player newPlayer = Player.fromJson(message.getJSON());
-            newPlayer.setChannel(ctx.channel());
+        switch (message.getCommand()) {
+            case "PLAYER":
+                Player newPlayer = Player.fromJson(message.getJSON());
+                newPlayer.setChannel(ctx.channel());
 
-            this.player.change(newPlayer);
+                this.player.change(newPlayer);
+                break;
+            case "TELL":
+                this.message.change(message.getJSON().getAsString());
+                break;
         }
     }
 

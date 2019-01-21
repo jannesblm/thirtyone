@@ -1,8 +1,10 @@
 package de.lebk.thirtyone.game.network;
 
+import com.google.gson.JsonPrimitive;
 import de.lebk.thirtyone.game.GameException;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.Round;
+import de.lebk.thirtyone.game.RoundEnd;
 import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
@@ -19,20 +21,17 @@ public class NetworkRound extends Round
     protected static final int MAX_PLAYERS = 4;
     protected Deck staple;
 
-    public NetworkRound()
-    {
-        staple = Deck.newSkat();
-    }
-
     public void join(NetworkPlayer player) throws ConnectError
     {
         if (players.size() >= MAX_PLAYERS) {
             throw new ConnectError("Round size limit reached!");
         }
 
-        if (players.size() == 0) {
+        if (playerCount() == 0) {
             setCurrentPlayer(player);
         }
+
+        player.setName("Spieler " + (playerCount() + 1));
 
         players.add(player);
     }
@@ -42,15 +41,28 @@ public class NetworkRound extends Round
         players.remove(player);
     }
 
-    public void updateAll()
+    public void updateAll(final String cause)
     {
         for (Player player : players) {
-            ((NetworkPlayer) player).update();
+            ((NetworkPlayer) player).update(cause);
+        }
+    }
+
+    public void broadcast(final Message message)
+    {
+        for (Player player : players) {
+            ((NetworkPlayer) player).send(message);
         }
     }
 
     public void start()
     {
+        if (isStarted()) {
+            return;
+        }
+
+        staple = Deck.newSkat();
+
         setMiddle(staple.deal(3));
         setStarted(true);
 
@@ -58,45 +70,67 @@ public class NetworkRound extends Round
             player.setDeck(staple.deal(3));
         }
 
-        updateAll();
+        updateAll("Die Runde wurde gestartet.");
     }
 
-    public void swap(Player p, Card card, Card middleCard) throws GameException
+    public void reset()
     {
-        Optional<Player> player = getPlayer(p);
+        setMiddle(new Deck(3));
+        setStarted(false);
 
-        if (!player.isPresent()) {
-            throw new GameException("Swapping player was not found in this round!");
+        for (Player player : players) {
+            player.setPassed(false);
+            player.setDeck(new Deck(3));
+        }
+    }
+
+    public void swap(int playerIndex, int middleIndex) throws GameException, RoundEnd
+    {
+        Optional<Player> currentPlayer = getCurrentPlayer();
+
+        if (!currentPlayer.isPresent()) {
+            throw new GameException("Current player is not present.");
         }
 
-        Deck deck = player.get().getDeck();
+        Deck deck = currentPlayer.get().getDeck();
 
-        deck.swap(card, middleCard);
-        middle.swap(middleCard, card);
+        Optional<Card> playerSwap = deck.get(playerIndex);
+        Optional<Card> middleSwap = middle.get(middleIndex);
+
+        if (!playerSwap.isPresent() || !middleSwap.isPresent()) {
+            throw new GameException("Either player swap or middle swap requested is not present.");
+        }
+
+        deck.swap(playerSwap.get(), middleSwap.get());
+        middle.swap(middleSwap.get(), playerSwap.get());
+
+        if (deck.getPoints() == 31.0 || deck.getPoints() == 33.0) {
+            throw new RoundEnd(currentPlayer.get().getName() + " hat die höchste Punktzahl erreicht!");
+        }
     }
 
-    public Player nextPlayer() throws GameException
+    public Player next(final String message) throws GameException, RoundEnd
     {
         List<Player> playerList = List.copyOf(players);
 
-        for (Player player : playerList) {
-            if (currentPlayer == null) {
-                return player;
-            } else {
-                if (currentPlayer.getUuid() != player.getUuid()) {
-                    return player;
-                } else {
-                    int index = playerList.indexOf(player);
-
-                    if (index == -1) {
-                        throw new GameException("Player list does not contain player during iteration.");
-                    }
-
-                    return playerList.get(index + 1 >= playerList.size() ? 0 : index + 1);
-                }
-            }
+        if (playerList.size() == 0) {
+            throw new GameException("No player remaining.");
         }
 
-        throw new GameException("Did not select a new player. Is the player list empty?");
+        if (currentPlayer == null) {
+            currentPlayer = playerList.get(0);
+        }
+
+        int currentIndex = playerList.indexOf(currentPlayer);
+        currentPlayer = playerList.get(currentIndex + 1 < playerList.size() ? currentIndex + 1 : 0);
+
+        if (currentPlayer.isPassed()) {
+            throw new RoundEnd(currentPlayer.getName() + " hat gepasst!");
+        }
+
+        updateAll(message);
+        currentPlayer.send(new Message("TELL", new JsonPrimitive("Sie sind dran!")));
+
+        return currentPlayer;
     }
 }

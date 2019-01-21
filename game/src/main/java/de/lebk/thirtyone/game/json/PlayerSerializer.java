@@ -13,6 +13,7 @@ public class PlayerSerializer implements JsonSerializer<Player>
         JsonObject result = new JsonObject();
 
         result.add("uuid", new JsonPrimitive(player.getUuid().toString()));
+        result.add("name", new JsonPrimitive(player.getName()));
         result.add("deck", player.getDeck().toJson());
         result.add("round", player.getRound().toJson());
         result.add("passed", new JsonPrimitive(player.isPassed()));

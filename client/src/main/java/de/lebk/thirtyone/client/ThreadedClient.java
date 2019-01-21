@@ -20,6 +20,7 @@ public class ThreadedClient extends Client
 
     private ObservedProperty<Boolean> connected;
     private ObservedProperty<Player> player;
+    private ObservedProperty<String> message;
 
     private Channel channel;
     private Thread thread;
@@ -27,8 +28,10 @@ public class ThreadedClient extends Client
     public ThreadedClient()
     {
         super();
+
         connected = new ObservedProperty<>(false);
         player = new ObservedProperty<>(new Player());
+        message = new ObservedProperty<>("");
     }
 
     public void connectAsync()
@@ -43,7 +46,7 @@ public class ThreadedClient extends Client
                         ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
                         ch.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                         ch.pipeline().addLast(new MessageDecoder());
-                        ch.pipeline().addLast(new ClientHandler(player));
+                        ch.pipeline().addLast(new ClientHandler(player, message));
                     }
                 });
             } catch (Exception e) {
@@ -86,6 +89,11 @@ public class ThreadedClient extends Client
     public ObservedProperty<Player> getPlayerProperty()
     {
         return player;
+    }
+
+    public ObservedProperty<String> getMessageProperty()
+    {
+        return message;
     }
 
     public boolean isConnected()

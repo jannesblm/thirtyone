@@ -5,12 +5,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import de.lebk.thirtyone.game.json.DeckSerializer;
 import de.lebk.thirtyone.game.json.JsonSerializable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comparable<Deck>
 {
+    private static final Logger LOG = LogManager.getLogger();
+
     private final int limit;
     private final Random randomizer;
     private List<Card> cards;
@@ -121,14 +125,39 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
      *
      * @return int
      */
-    private int getPoints()
+    public float getPoints()
     {
-        // Map each Suit group to the sum of its cards values
+        // Group by value to check for three of a kind
+        Map<Symbol, List<Card>> valueGroups = cards.stream()
+                .collect(Collectors.groupingBy(Card::getSymbol));
+
+        for (Map.Entry<Symbol, List<Card>> entry : valueGroups.entrySet()) {
+            if (entry.getValue().size() < 3) {
+                continue;
+            }
+
+            // This symbol set contains three cards. Check if their distinct values are equal to 1.
+            int[] values = entry.getValue().stream()
+                    .mapToInt(Card::getValue)
+                    .distinct()
+                    .toArray();
+
+            if (values.length == 1) {
+                // If they are, we have three of a kind. If it is three aces return 33, otherwise 30.5.
+                return (values[0] == 11) ? 33f : 30.5f;
+            }
+        }
+
+        // We did not find three of a kind
+        // So map each Suit group to the sum of its cards values
         return cards.stream()
                 .collect(Collectors.groupingBy(Card::getSuit))
                 .entrySet()
                 .stream()
-                .mapToInt(e -> e.getValue().stream().mapToInt(Card::getValue).reduce(0, Integer::sum))
+                .mapToInt(e -> e.getValue()
+                        .stream()
+                        .mapToInt(Card::getValue)
+                        .reduce(0, Integer::sum))
                 .max()
                 .orElse(0);
     }

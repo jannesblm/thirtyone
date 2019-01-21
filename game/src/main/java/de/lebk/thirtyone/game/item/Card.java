@@ -37,7 +37,7 @@ public class Card extends JsonSerializable<Card> implements Comparable<Card>
         return suit;
     }
 
-    private Symbol getSymbol()
+    public Symbol getSymbol()
     {
         return symbol;
     }

@@ -205,8 +205,12 @@
                         text="Schieben" disable="true"/>
                 <Button fx:id="passButton" mnemonicParsing="false" onMouseClicked="#onPassButtonClick"
                         text="Passen" disable="true"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lifeLabel" text="Leben: 0"/>
+                <Separator orientation="VERTICAL" prefHeight="10.0"/>
+                <Label fx:id="pointLabel" text="Punkte: 0"/>
             </items>
         </ToolBar>
-        <TextArea fx:id="logArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4"/>
+        <TextArea fx:id="logArea" editable="false" prefHeight="250.0" prefWidth="200.0" GridPane.rowIndex="4"/>
     </children>
 </GridPane>

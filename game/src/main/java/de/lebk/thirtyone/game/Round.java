@@ -6,10 +6,8 @@ import de.lebk.thirtyone.game.item.Deck;
 import de.lebk.thirtyone.game.json.JsonSerializable;
 import de.lebk.thirtyone.game.json.RoundSerializer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Round extends JsonSerializable<Round>
 {
@@ -79,6 +77,30 @@ public class Round extends JsonSerializable<Round>
         }
 
         return Optional.of(currentPlayer);
+    }
+
+    public List<Player> getWinner()
+    {
+        final Map<Float, List<Player>> scores = players.stream()
+                .collect(Collectors.groupingBy(Player::getPoints));
+
+        if (scores.size() == 1) {
+            return new ArrayList<>();
+        }
+
+        final float maxScore = Collections.max(scores.keySet());
+
+        return scores.get(maxScore);
+    }
+
+    public List<Player> getLoser()
+    {
+        final Map<Float, List<Player>> scores = players.stream()
+                .collect(Collectors.groupingBy(Player::getPoints));
+
+        final float minScore = Collections.min(scores.keySet());
+
+        return scores.get(minScore);
     }
 
     public void setCurrentPlayer(Player currentPlayer)

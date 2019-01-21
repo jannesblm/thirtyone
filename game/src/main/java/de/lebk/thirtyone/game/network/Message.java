@@ -64,10 +64,10 @@ public class Message implements Serializable
             return Optional.empty();
         }
 
-        JsonObject element;
+        JsonElement element;
 
         try {
-            element = new JsonParser().parse(tokens[1]).getAsJsonObject();
+            element = new JsonParser().parse(tokens[1]);
         } catch (JsonSyntaxException exception) {
             return Optional.empty();
         }
