@@ -6,16 +6,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="io.netty" level="INFO" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
-        <Logger name="de.lebk.thirtyone.server" level="DEBUG" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
         <Logger name="de.lebk.thirtyone.client" level="DEBUG" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
-        <Logger name="de.lebk.thirtyone.game" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
     </Loggers>
