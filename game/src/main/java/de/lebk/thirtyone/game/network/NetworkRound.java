@@ -7,6 +7,7 @@ import de.lebk.thirtyone.game.Round;
 import de.lebk.thirtyone.game.RoundEnd;
 import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
+import de.lebk.thirtyone.game.item.DeckEmptyException;
 import de.lebk.thirtyone.game.network.exception.ConnectError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,14 +25,22 @@ public class NetworkRound extends Round
     public void join(NetworkPlayer player) throws ConnectError
     {
         if (players.size() >= MAX_PLAYERS) {
-            throw new ConnectError("Round size limit reached!");
+            throw new ConnectError("Maximale Rundengröße erreicht");
+        }
+
+        if (isStarted()) {
+            throw new ConnectError("Die Runde hat bereits begonnen!");
+        }
+
+        boolean nameTaken = players.stream().anyMatch(p -> p.getName().equalsIgnoreCase(player.getName()));
+
+        if (nameTaken) {
+            throw new ConnectError("Dieser Name ist bereits vergeben!");
         }
 
         if (playerCount() == 0) {
             setCurrentPlayer(player);
         }
-
-        player.setName("Spieler " + (playerCount() + 1));
 
         players.add(player);
     }
@@ -41,6 +50,11 @@ public class NetworkRound extends Round
         players.remove(player);
     }
 
+    public void updateAll()
+    {
+        updateAll(null);
+    }
+
     public void updateAll(final String cause)
     {
         for (Player player : players) {
@@ -48,14 +62,19 @@ public class NetworkRound extends Round
         }
     }
 
-    public void broadcast(final Message message)
+    public void broadcast(final String message)
     {
         for (Player player : players) {
-            ((NetworkPlayer) player).send(message);
+            player.send(new Message("TELL", new JsonPrimitive(message)));
         }
     }
 
-    public void start()
+    public void dealMiddle() throws DeckEmptyException
+    {
+        setMiddle(staple.deal(3));
+    }
+
+    public void start() throws DeckEmptyException
     {
         if (isStarted()) {
             return;
@@ -63,7 +82,7 @@ public class NetworkRound extends Round
 
         staple = Deck.newSkat();
 
-        setMiddle(staple.deal(3));
+        dealMiddle();
         setStarted(true);
 
         for (Player player : players) {
@@ -71,6 +90,9 @@ public class NetworkRound extends Round
         }
 
         updateAll("Die Runde wurde gestartet.");
+
+        currentPlayer.send(new Message("TELL",
+                new JsonPrimitive("Sie sind dran!")));
     }
 
     public void reset()
@@ -122,7 +144,31 @@ public class NetworkRound extends Round
         }
 
         int currentIndex = playerList.indexOf(currentPlayer);
-        currentPlayer = playerList.get(currentIndex + 1 < playerList.size() ? currentIndex + 1 : 0);
+        int nextIndex = currentIndex + 1 < playerList.size() ? currentIndex + 1 : 0;
+
+        if (nextIndex == 0) {
+            // Each player had a turn
+            boolean allPushed = playerList.stream()
+                    .allMatch(player -> ((NetworkPlayer) player).isPushed());
+
+            if (allPushed) {
+                // A new middle shall be dealt
+
+                try {
+                    dealMiddle();
+
+                    broadcast("Drei neue Karten in die Mitte!");
+                } catch (DeckEmptyException exception) {
+                    broadcast("Der Stapel ist leer. Es können keine neuen Karten ausgeteilt werden!");
+                }
+            }
+
+            // Reset each players pushed state
+            players.forEach(player -> ((NetworkPlayer) player)
+                    .setPushed(false));
+        }
+
+        currentPlayer = playerList.get(nextIndex);
 
         if (currentPlayer.isPassed()) {
             throw new RoundEnd(currentPlayer.getName() + " hat gepasst!");

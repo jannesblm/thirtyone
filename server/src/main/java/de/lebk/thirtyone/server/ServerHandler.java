@@ -1,10 +1,10 @@
 package de.lebk.thirtyone.server;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 import de.lebk.thirtyone.game.GameException;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.RoundEnd;
+import de.lebk.thirtyone.game.item.DeckEmptyException;
 import de.lebk.thirtyone.game.network.Message;
 import de.lebk.thirtyone.game.network.NetworkPlayer;
 import de.lebk.thirtyone.game.network.NetworkRound;
@@ -21,6 +21,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Message>
     private static final Logger LOG = LogManager.getLogger();
 
     private final NetworkPlayer player;
+    private String lastCommand;
 
     ServerHandler(NetworkRound round)
     {
@@ -46,6 +47,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<Message>
             try {
                 // TODO: Version validation
 
+                if (message.getJSON().isJsonPrimitive()) {
+                    player.setName(message.getJSON().getAsString());
+                }
+
                 player.join(ctx.channel());
 
                 LOG.info("Player " + player.getRound().playerCount() + " joined with UUID " + player.getUuid());
@@ -67,12 +72,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<Message>
         }
 
         try {
-            switch (message.getCommand()) {
+            switch (message.getCommand().toUpperCase()) {
                 case "START":
                     round.start();
                     break;
                 case "PUSH":
-                    // TODO: Re-deal three cards when every player pushed.
+                    player.setPushed(true);
                     round.next(player.getName() + " schiebt.");
                     break;
                 case "PASS":
@@ -88,30 +93,29 @@ public class ServerHandler extends SimpleChannelInboundHandler<Message>
         } catch (RoundEnd roundEnd) {
             round.setStarted(false);
 
-            round.broadcast(new Message("TELL",
-                    new JsonPrimitive("Runde vorbei: " + roundEnd.getMessage())));
+            round.broadcast("Runde vorbei: " + roundEnd.getMessage());
 
             // Determine winner and losers
-            List<Player> winners = round.getWinner();
-            List<Player> losers = round.getLoser();
+            List<Player> winners = round.getWinners();
+            List<Player> losers = round.getLosers();
 
-            round.broadcast(new Message("TELL", new JsonPrimitive(
+            round.broadcast(
                     "Gewinner: " + String.join(", ",
                             winners.stream().map(Player::getName).toArray(String[]::new))
-            )));
+            );
 
-            round.broadcast(new Message("TELL", new JsonPrimitive(
+            round.broadcast(
                     "Verlierer: " + String.join(", ",
                             losers.stream().map(Player::getName).toArray(String[]::new)) + " (-1 Leben)"
-            )));
+            );
 
             losers.forEach(player -> player.setLifes(player.getLifes() - 1));
 
             // TODO: Kick players with zero lifes left?
 
-            round.updateAll(null);
+            round.updateAll();
             round.reset();
-        } catch (GameException exception) {
+        } catch (GameException | DeckEmptyException exception) {
             LOG.error(exception);
         }
 

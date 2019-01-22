@@ -79,7 +79,7 @@ public class Round extends JsonSerializable<Round>
         return Optional.of(currentPlayer);
     }
 
-    public List<Player> getWinner()
+    public List<Player> getWinners()
     {
         final Map<Float, List<Player>> scores = players.stream()
                 .collect(Collectors.groupingBy(Player::getPoints));
@@ -93,7 +93,7 @@ public class Round extends JsonSerializable<Round>
         return scores.get(maxScore);
     }
 
-    public List<Player> getLoser()
+    public List<Player> getLosers()
     {
         final Map<Float, List<Player>> scores = players.stream()
                 .collect(Collectors.groupingBy(Player::getPoints));

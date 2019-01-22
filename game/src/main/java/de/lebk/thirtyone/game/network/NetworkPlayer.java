@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public class NetworkPlayer extends Player
 {
+    private boolean pushed = false;
+
     public NetworkPlayer(NetworkRound round)
     {
         super(UUID.randomUUID(), "New player", round, new Deck(3), DEFAULT_LIFE_COUNT);
@@ -23,7 +25,7 @@ public class NetworkPlayer extends Player
         this.channel = channel;
         getRound().join(this);
 
-        update("Einer aktiven Runde beigetreten.");
+        update("Willkommen, " + this.getName() + "!");
 
         joined = true;
     }
@@ -60,5 +62,15 @@ public class NetworkPlayer extends Player
         if (cause != null) {
             send(new Message("TELL", new JsonPrimitive(cause)));
         }
+    }
+
+    public boolean isPushed()
+    {
+        return this.pushed;
+    }
+
+    public void setPushed(boolean pushed)
+    {
+        this.pushed = pushed;
     }
 }

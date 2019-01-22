@@ -1,9 +1,11 @@
 package de.lebk.thirtyone.client;
 
+import com.google.gson.JsonObject;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.network.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,9 +14,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
     private static final Logger LOG = LogManager.getLogger();
 
     private ObservedProperty<Player> player;
-    private ObservedProperty<String> message;
+    private ObservedProperty<LogMessage> message;
 
-    public ClientHandler(ObservedProperty<Player> player, ObservedProperty<String> message)
+    public ClientHandler(ObservedProperty<Player> player, ObservedProperty<LogMessage> message)
     {
         this.player = player;
         this.message = message;
@@ -33,7 +35,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<Message>
                 this.player.change(newPlayer);
                 break;
             case "TELL":
-                this.message.change(message.getJSON().getAsString());
+                this.message.change(new LogMessage("[SERVER] " + message.getJSON().getAsString()));
+                break;
+            case "BYE":
+                JsonObject reasonObject = message.getJSON().getAsJsonObject();
+                this.message.change(new LogMessage("[SERVER] " + reasonObject.get("reason").getAsString(), Color.RED));
                 break;
         }
     }

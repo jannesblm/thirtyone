@@ -1,6 +1,5 @@
 package de.lebk.thirtyone.client;
 
-import de.lebk.thirtyone.game.network.exception.ConnectError;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -8,20 +7,24 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.BiConsumer;
+
 public abstract class Client
 {
     private static final Logger LOG = LogManager.getLogger();
 
     private String host;
+    private String playerName;
     private int port;
 
     Client()
     {
         host = "";
+        playerName = "Spieler";
         port = 0;
     }
 
-    void connect(ChannelInitializer initializer) throws Exception
+    void connect(ChannelInitializer initializer, BiConsumer<Boolean, Throwable> result) throws Exception
     {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -37,9 +40,7 @@ public abstract class Client
             LOG.info("Trying " + host + ":" + port);
 
             f.addListener((ChannelFutureListener) cf -> {
-                if (!cf.isSuccess()) {
-                    throw new ConnectError("Connection failed");
-                }
+                result.accept(cf.isSuccess(), cf.cause());
 
                 onConnect(f.channel());
             });
@@ -50,14 +51,24 @@ public abstract class Client
         }
     }
 
-    public void setHost(String newHost)
+    public void setHost(final String host)
     {
-        host = newHost;
+        this.host = host;
     }
 
-    public void setPort(int newPort)
+    public String getPlayerName()
     {
-        port = newPort;
+        return playerName;
+    }
+
+    public void setPlayerName(final String playerName)
+    {
+        this.playerName = playerName;
+    }
+
+    public void setPort(final int port)
+    {
+        this.port = port;
     }
 
     public abstract void disconnect();

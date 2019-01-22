@@ -183,21 +183,25 @@ public class Deck extends JsonSerializable<Deck> implements Iterable<Card>, Comp
         Collections.shuffle(cards, randomizer);
     }
 
-    private Optional<Card> pop()
+    private Card pop() throws DeckEmptyException
     {
         if (violatesBounds(-1)) {
-            return Optional.empty();
+            throw new DeckEmptyException();
         }
 
-        return Optional.of(cards.remove(0));
+        return cards.remove(0);
     }
 
-    public Deck deal(int amount)
+    public Deck deal(int amount) throws DeckEmptyException
     {
+        if (this.size() < amount) {
+            throw new DeckEmptyException();
+        }
+
         Deck deal = new Deck(amount);
 
         for (int i = 0; i < amount; i++) {
-            pop().ifPresent(deal::add);
+            deal.add(pop());
         }
 
         return deal;

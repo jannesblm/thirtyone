@@ -2,32 +2,44 @@ package de.lebk.thirtyone.client.controller;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import de.lebk.thirtyone.client.ConnectStatus;
 import de.lebk.thirtyone.client.ThreadedClient;
 import de.lebk.thirtyone.game.Player;
 import de.lebk.thirtyone.game.Round;
 import de.lebk.thirtyone.game.item.Card;
 import de.lebk.thirtyone.game.item.Deck;
+import de.lebk.thirtyone.game.item.DeckEmptyException;
 import de.lebk.thirtyone.game.network.Message;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,7 +52,10 @@ public class GameTable extends Application
     private ThreadedClient client;
 
     @FXML
-    private TextArea logArea;
+    private TextFlow logArea;
+
+    @FXML
+    private ScrollPane logAreaScrollPane;
 
     @FXML
     private Button connectButton;
@@ -78,6 +93,9 @@ public class GameTable extends Application
     @FXML
     private Label lifeLabel;
 
+    @FXML
+    private Label nameLabel;
+
     public static void main(String[] args)
     {
         launch(args);
@@ -91,7 +109,7 @@ public class GameTable extends Application
         primaryStage.setTitle("Thirtyone");
         primaryStage.setMinHeight(600);
         primaryStage.setMinWidth(800);
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 900, 700));
         primaryStage.show();
 
     }
@@ -99,6 +117,8 @@ public class GameTable extends Application
     @FXML
     private void initialize()
     {
+        logAreaScrollPane.vvalueProperty().bind(logArea.heightProperty());
+
         client = new ThreadedClient();
 
         client.getConnectedProperty().addListener((oldConnected, connected) -> Platform.runLater(() -> {
@@ -115,7 +135,8 @@ public class GameTable extends Application
             }
         }));
 
-        client.getMessageProperty().addListener((oldMessage, message) -> clientLog(message));
+        client.getMessageProperty().addListener((oldMessage, message) ->
+                clientLog(message.getMessage(), message.getColor()));
 
         client.getPlayerProperty().addListener(((oldPlayer, player) -> {
             LOG.debug("The player has changed: " + player);
@@ -148,32 +169,61 @@ public class GameTable extends Application
 
             final float points = player.getDeck().getPoints();
             final int lifes = player.getLifes();
+            final String name = player.getName();
 
             Platform.runLater(() -> {
                 refreshAllBoxes();
 
+                nameLabel.setText("Name: " + name);
                 pointLabel.setText("Punkte: " + points);
                 lifeLabel.setText("Leben: " + lifes);
             });
 
         }));
+
         emptyAllBoxes();
     }
 
     public void onConnectButtonClick(MouseEvent mouseEvent)
     {
         if (!client.isConnected()) {
-            TextInputDialog connectDialog = new TextInputDialog("localhost:9942");
+            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            dialog.setTitle("Verbinden");
+            dialog.setHeaderText("Mit einem Server verbinden");
 
-            connectDialog.setTitle("Verbinden");
-            connectDialog.setHeaderText("Mit einem Server verbinden");
-            connectDialog.setContentText("Adresse:");
+            ButtonType connectButtonType = new ButtonType("Verbinden", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(connectButtonType, ButtonType.CANCEL);
 
-            Optional<String> result = connectDialog.showAndWait();
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
 
-            result.ifPresent(input -> {
+            TextField playerField = new TextField();
+            playerField.setText("Spieler");
+
+            TextField hostField = new TextField();
+            hostField.setText("localhost:9942");
+
+            grid.add(new Label("Name:"), 0, 0);
+            grid.add(playerField, 1, 0);
+            grid.add(new Label("Adresse:"), 0, 1);
+            grid.add(hostField, 1, 1);
+
+            dialog.getDialogPane().setContent(grid);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == connectButtonType) {
+                    return new Pair<>(playerField.getText(), hostField.getText());
+                }
+                return null;
+            });
+
+            Optional<Pair<String, String>> result = dialog.showAndWait();
+
+            result.ifPresent(connectValues -> {
                 try {
-                    URI uri = new URI("tcp://" + input);
+                    URI uri = new URI("tcp://" + connectValues.getValue());
                     String host = uri.getHost();
                     int port = uri.getPort();
 
@@ -184,12 +234,21 @@ public class GameTable extends Application
 
                     client.setHost(host);
                     client.setPort(port);
+                    client.setPlayerName(connectValues.getKey());
 
-                    clientLog("Versuche mit " + host + ":" + port + " zu verbinden...");
+                    clientLog("Versuche als '" + connectValues.getKey() + "' mit " + host + ":"
+                            + port + " zu verbinden...");
 
-                    client.connectAsync();
+                    CompletableFuture<ConnectStatus> connected = client.connectAsync();
 
-                    // TODO: React on connect success or fail
+                    connected.whenComplete((status, exception) -> {
+                        if (!status.isSuccess()) {
+                            clientLog("Verbindung fehlgeschlagen: " + status.getError().getMessage(), Color.RED);
+                        } else {
+                            clientLog("Verbunden, Anmeldung erfolgt.", Color.GREEN);
+                        }
+                    });
+
                 } catch (URISyntaxException e) {
                     new Alert(Alert.AlertType.ERROR, "Der Hostname ist ungültig.").show();
                 }
@@ -199,30 +258,54 @@ public class GameTable extends Application
         }
     }
 
-    public void clientLog(String text)
+    public void clientLog(final String text)
     {
-        logArea.appendText(text + System.lineSeparator());
+        clientLog(text, Color.BLACK);
+    }
+
+    public void clientLog(final String text, final Color color)
+    {
+        Platform.runLater(() -> {
+            String timeStamp = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+            Text logEntry = new Text(timeStamp + " " + text + System.lineSeparator());
+
+            logEntry.setFont(Font.font("Consolas"));
+            logEntry.setFill(color);
+            logArea.getChildren().add(logEntry);
+        });
     }
 
     public void refreshBox(final HBox box, final Deck deck)
     {
         box.lookupAll(".cardButton").forEach(button -> {
-            Optional<Card> card = deck.deal(1).get(0);
+            Optional<Card> card;
+
+            try {
+                card = deck.deal(1).get(0);
+            } catch (DeckEmptyException exception) {
+                card = Optional.empty();
+            }
 
             String cardName;
 
             if (card.isPresent()) {
                 cardName = card.get().getImageName();
             } else {
+                // Gracefully use back image when we weren't able to pop a card
                 cardName = "back.png";
             }
 
-            final ImageView image = new ImageView(this.getClass().getClassLoader().getResource("cards/" + cardName).toString());
+            final ImageView image = new ImageView(
+                    this.getClass()
+                            .getClassLoader()
+                            .getResource("cards/" + cardName)
+                            .toString()
+            );
 
-            image.setFitHeight(((ToggleButton) button).getPrefHeight() - 10);
-            image.setFitWidth(((ToggleButton) button).getPrefWidth() - 10);
+            image.setFitHeight(((ButtonBase) button).getPrefHeight() - 10);
+            image.setFitWidth(((ButtonBase) button).getPrefWidth() - 10);
 
-            ((ToggleButton) button).setGraphic(image);
+            ((ButtonBase) button).setGraphic(image);
         });
     }
 
@@ -239,13 +322,13 @@ public class GameTable extends Application
         refreshBox(currentPlayerBox, player.getDeck());
         refreshBox(middleBox, player.getRound().getMiddle());
 
-        List<Player> opponents = player.getRound()
+        final List<Player> opponents = player.getRound()
                 .getPlayers()
                 .stream()
                 .filter(p -> !p.equals(player))
                 .collect(Collectors.toList());
 
-        List<HBox> opponentBoxes = List.of(leftOpponentBox, middleOpponentBox, rightOpponentBox);
+        final List<HBox> opponentBoxes = List.of(leftOpponentBox, middleOpponentBox, rightOpponentBox);
 
         for (int i = 0; i < opponents.size(); i++) {
             if (i >= opponentBoxes.size()) {
@@ -309,6 +392,8 @@ public class GameTable extends Application
 
     public void send(Message message)
     {
-        client.getPlayerProperty().getValue().send(message);
+        client.getPlayerProperty()
+                .getValue()
+                .send(message);
     }
 }
